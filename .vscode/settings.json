@@ -1,0 +1,17 @@
+﻿{
+    "cmake.cmakePath": "D:/vs2022_Professional/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe",
+    "cmake.generator": "Ninja",
+    "cmake.configurePreset": "msvc-debug",
+    "cmake.copyCompileCommands": "${workspaceFolder}/compile_commands.json",
+    "cmake.configureOnOpen": false,
+    "cmake.showConfigureWithDebuggerNotification": false,
+    "cmake.environment": {
+        "PATH": "D:/vs2022_Professional/VC/Tools/MSVC/14.42.34433/bin/Hostx64/x64;D:/vs2022_Professional/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja;D:/vs2022_Professional/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin;${env:PATH}"
+    },
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+    "C_Cpp.default.compileCommands": "${workspaceFolder}/compile_commands.json",
+    "editor.formatOnSave": true,
+    "[cpp]": {
+        "editor.defaultFormatter": "xaver.clang-format"
+    }
+}
