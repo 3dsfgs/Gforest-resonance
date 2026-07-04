@@ -13,9 +13,22 @@
 
 namespace rl
 {
+    void CharacterController::set_input_enabled(const bool enabled)
+    {
+        m_input_enabled = enabled;
+    }
+
+    bool CharacterController::input_enabled() const
+    {
+        return m_input_enabled;
+    }
+
     void CharacterController::_process(double delta_time)
     {
         if (engine::editor_active())
+            return;
+
+        if (!m_input_enabled)
             return;
 
         godot::Input* input_handler{ input::get() };

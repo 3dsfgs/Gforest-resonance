@@ -9,6 +9,7 @@
 #include "entity/controller/enemy_controller.hpp"
 #include "entity/controller/player_controller.hpp"
 #include "entity/level.hpp"
+#include "entity/projectile/projectile.hpp"
 #include "singletons/console.hpp"
 #include "util/bind.hpp"
 #include "util/conversions.hpp"
@@ -19,6 +20,24 @@
 
 namespace rl
 {
+    namespace
+    {
+        constexpr const char* state_label(const LevelState state)
+        {
+            switch (state)
+            {
+                case LevelState::Playing:
+                    return "Playing";
+                case LevelState::Victory:
+                    return "Victory";
+                case LevelState::Defeat:
+                    return "Defeat";
+                default:
+                    return "Unknown";
+            }
+        }
+    }
+
     Level::Level()
     {
         scene::node::set_unique_name(this, name::level::level1);
@@ -39,6 +58,8 @@ namespace rl
         this->add_child(m_projectile_spawner);
         this->spawn_enemies_from_markers();
 
+        signal<event::died>::connect<Player>(m_player) <=> signal_callback(this, on_player_died);
+
         PlayerController* controller{ gdcast<PlayerController>(m_player->get_controller()) };
         if (controller != nullptr)
         {
@@ -48,6 +69,11 @@ namespace rl
             signal<event::spawn_projectile>::connect<Player>(m_player) <=>
                 signal_callback(this, on_player_spawn_projectile);
         }
+    }
+
+    LevelState Level::get_state() const
+    {
+        return m_state;
     }
 
     void Level::spawn_player_at_marker()
@@ -87,7 +113,99 @@ namespace rl
             enemy->set_controller(memnew(EnemyController));
             enemy->set_global_position(marker->get_global_position());
             this->add_child(enemy);
+
+            signal<event::died>::connect<Enemy>(enemy) <=> signal_callback(this, on_enemy_died);
+            ++m_enemy_count;
         }
+    }
+
+    void Level::clear_enemies()
+    {
+        for (int i = this->get_child_count() - 1; i >= 0; --i)
+        {
+            godot::Node* child{ this->get_child(i) };
+            if (child != nullptr && godot::Object::cast_to<Enemy>(child) != nullptr)
+                child->queue_free();
+        }
+    }
+
+    void Level::clear_projectiles()
+    {
+        for (int i = this->get_child_count() - 1; i >= 0; --i)
+        {
+            godot::Node* child{ this->get_child(i) };
+            if (child != nullptr && godot::Object::cast_to<Projectile>(child) != nullptr)
+                child->queue_free();
+        }
+    }
+
+    void Level::set_player_input_enabled(const bool enabled)
+    {
+        if (m_player == nullptr)
+            return;
+
+        PlayerController* controller{ gdcast<PlayerController>(m_player->get_controller()) };
+        if (controller != nullptr)
+            controller->set_input_enabled(enabled);
+    }
+
+    void Level::transition_to_state(const LevelState new_state)
+    {
+        if (m_state != LevelState::Playing)
+            return;
+
+        if (new_state == LevelState::Playing)
+            return;
+
+        m_state = new_state;
+        this->set_player_input_enabled(false);
+
+        this->emit_signal(event::level_state_changed, static_cast<int>(new_state));
+
+        auto console{ console::get() };
+        if (new_state == LevelState::Victory)
+            console->print("{} {}", io::green("level state"), io::green(state_label(new_state)));
+        else
+            console->print("{} {}", io::red("level state"), io::red(state_label(new_state)));
+
+        if (new_state == LevelState::Defeat)
+            console->print("{} {}", io::yellow("press"), io::blue("R to restart"));
+    }
+
+    void Level::reset_level()
+    {
+        this->clear_projectiles();
+        this->clear_enemies();
+
+        m_state = LevelState::Playing;
+        m_enemy_count = 0;
+
+        if (m_player != nullptr)
+        {
+            m_player->reset_hearts();
+            this->spawn_player_at_marker();
+        }
+
+        this->set_player_input_enabled(true);
+        this->spawn_enemies_from_markers();
+
+        auto console{ console::get() };
+        console->print("{} {}", io::green("level reset"), io::blue(state_label(m_state)));
+    }
+
+    void Level::handle_restart_input()
+    {
+        if (m_state != LevelState::Defeat)
+            return;
+
+        godot::Input* input_handler{ input::get() };
+        if (input_handler == nullptr)
+            return;
+
+        if (!input_handler->is_action_just_pressed(input::action::restart))
+            return;
+
+        this->reset_level();
     }
 
     void Level::_process(double delta_time)
@@ -100,12 +218,15 @@ namespace rl
         else if (!this->active() && !input::cursor_visible()) [[unlikely]]
             input::show_cursor();
 
+        if (m_state == LevelState::Defeat)
+            this->handle_restart_input();
+
         this->queue_redraw();
     }
 
     void Level::_draw()
     {
-        if (this->active()) [[likely]]
+        if (this->active() && m_state == LevelState::Playing) [[likely]]
         {
             godot::Point2 mouse_pos{ this->get_global_mouse_position() };
             this->draw_circle(mouse_pos, 5, { "DARK_CYAN" });
@@ -126,11 +247,17 @@ namespace rl
     {
         bind_member_function(Level, on_character_position_changed);
         bind_member_function(Level, on_player_spawn_projectile);
+        bind_member_function(Level, on_player_died);
+        bind_member_function(Level, on_enemy_died);
+        signal_binding<Level, event::level_state_changed>::add<int>();
     }
 
     [[signal_slot]]
     void Level::on_player_spawn_projectile(godot::Node* obj)
     {
+        if (m_state != LevelState::Playing)
+            return;
+
         Projectile* projectile{ m_projectile_spawner->spawn_projectile() };
         if (projectile != nullptr)
         {
@@ -149,9 +276,31 @@ namespace rl
     void Level::on_character_position_changed(const godot::Object* const node,
                                               godot::Vector2 location) const
     {
+        if (m_state != LevelState::Playing)
+            return;
+
         runtime_assert(node != nullptr);
         auto console{ console::get() };
         console->print("{} ({},{})", io::green(to<std::string>(node->get_class()) + " location: "),
                        io::orange(location.x), io::orange(location.y));
+    }
+
+    [[signal_slot]]
+    void Level::on_player_died()
+    {
+        this->transition_to_state(LevelState::Defeat);
+    }
+
+    [[signal_slot]]
+    void Level::on_enemy_died()
+    {
+        if (m_state != LevelState::Playing)
+            return;
+
+        if (m_enemy_count > 0)
+            --m_enemy_count;
+
+        if (m_enemy_count <= 0)
+            this->transition_to_state(LevelState::Victory);
     }
 }

@@ -34,10 +34,14 @@ namespace rl
         virtual void process_movement_input(godot::Input* const input, double delta_time);
         virtual void process_rotation_input(godot::Input* const input, double delta_time);
 
+        void set_input_enabled(bool enabled);
+        [[nodiscard]] bool input_enabled() const;
+
     protected:
         static void _bind_methods();
 
     protected:
+        bool m_input_enabled{ true };
         // the active input mode for character controls
         InputMode m_input_mode{ InputMode::MouseAndKeyboard };
         // target rotation

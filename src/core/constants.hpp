@@ -80,6 +80,7 @@ namespace rl::inline constants
         constexpr inline auto character_move{ "character_move" };
         constexpr inline auto character_rotate{ "character_rotate" };
         constexpr inline auto character_shoot{ "character_shoot" };
+        constexpr inline auto level_state_changed{ "level_state_changed" };
         constexpr inline auto body_entered{ "body_entered" };
         constexpr inline auto body_exited{ "body_exited" };
         constexpr inline auto signal_example{ "custom_signal_example" };

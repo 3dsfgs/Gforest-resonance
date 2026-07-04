@@ -22,6 +22,12 @@ namespace rl
 {
     class Player;
 
+    enum class LevelState {
+        Playing,
+        Victory,
+        Defeat
+    };
+
     class Level : public godot::Node2D
     {
         GDCLASS(Level, godot::Node2D);
@@ -37,18 +43,30 @@ namespace rl
         void activate(bool active = true);
         bool active() const;
 
+        [[nodiscard]] LevelState get_state() const;
+
     protected:
         static void _bind_methods();
 
         [[signal_slot]] void on_player_spawn_projectile(godot::Node* obj);
         [[signal_slot]] void on_character_position_changed(const godot::Object* const obj,
                                                            godot::Vector2 location) const;
+        [[signal_slot]] void on_player_died();
+        [[signal_slot]] void on_enemy_died();
 
     private:
         void spawn_player_at_marker();
         void spawn_enemies_from_markers();
+        void clear_enemies();
+        void clear_projectiles();
+        void set_player_input_enabled(bool enabled);
+        void transition_to_state(LevelState new_state);
+        void reset_level();
+        void handle_restart_input();
 
         std::atomic<bool> m_active{ false };
+        LevelState m_state{ LevelState::Playing };
+        int m_enemy_count{ 0 };
         godot::Node* m_background{ nullptr };
         ProjectileSpawner* m_projectile_spawner{ memnew(rl::ProjectileSpawner) };
         Player* m_player{ nullptr };

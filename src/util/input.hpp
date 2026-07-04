@@ -17,6 +17,7 @@ namespace rl::inline utils
             constexpr inline auto move_up{ "move_up" };
             constexpr inline auto move_down{ "move_down" };
             constexpr inline auto shoot{ "shoot" };
+            constexpr inline auto restart{ "restart" };
         }
 
         struct map
