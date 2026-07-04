@@ -15,6 +15,7 @@ namespace godot
 {
     class Marker2D;
     class Object;
+    class Sprite2D;
     struct Vector2;
 }
 
@@ -34,20 +35,25 @@ namespace rl
         virtual ~Character() = default;
 
         virtual void _ready() override;
+        void _process(double delta_time) override;
 
     public:
         CharacterController* get_controller() const;
         void set_controller(CharacterController* controller);
 
         [[nodiscard]] bool is_alive() const;
+        [[nodiscard]] bool is_invincible() const;
         [[nodiscard]] int get_hearts() const;
         [[nodiscard]] int get_max_hearts() const;
-        bool take_damage(int hearts = 1);
+        bool take_damage(int hearts = 1, bool bypass_invincibility = false);
         void reset_hearts();
 
     protected:
         virtual void process_slide_collisions();
         void emit_hearts_changed();
+        void start_invincibility();
+        void end_invincibility();
+        void update_invincibility_visual();
         [[property]] double get_movement_speed() const;
         [[property]] double get_movement_friction() const;
         [[property]] double get_rotation_speed() const;
@@ -79,6 +85,7 @@ namespace rl
             bind_member_function(Character, take_damage);
             bind_member_function(Character, reset_hearts);
             bind_member_function(Character, is_alive);
+            bind_member_function(Character, is_invincible);
 
             signal_binding<Character, event::position_changed>::add<godot::Object*, godot::Vector2>();
             signal_binding<Character, event::spawn_projectile>::add<godot::Object*, godot::Vector2>();
@@ -102,6 +109,10 @@ namespace rl
         CharacterController* m_character_controller{ nullptr };
         // marker identifying location where to spwwn projectiles
         godot::Marker2D* m_firing_point{ nullptr };
+        godot::Sprite2D* m_sprite{ nullptr };
         HeartHealth m_health{};
+        double m_invincibility_remaining{ 0.0 };
+        double m_blink_timer{ 0.0 };
+        bool m_blink_visible{ true };
     };
 }

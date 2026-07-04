@@ -59,7 +59,7 @@ namespace rl
 
         if ((layer & death_mask) != 0)
         {
-            take_damage(get_max_hearts());
+            take_damage(get_max_hearts(), true);
             console::get()->print("{} {}", io::red("death zone"), io::yellow("instant death"));
             return;
         }

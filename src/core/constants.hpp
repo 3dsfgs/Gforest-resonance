@@ -25,6 +25,7 @@ namespace rl::inline constants
             constexpr inline auto player{ "Player" };
             constexpr inline auto enemy{ "Enemy" };
             constexpr inline auto firing_pt{ "FiringPoint" };
+            constexpr inline auto sprite{ "PlayerSprite" };
         }
 
         namespace ui
@@ -32,6 +33,14 @@ namespace rl::inline constants
             constexpr inline auto heart_hud{ "HeartHud" };
         }
 
+    }
+
+    namespace combat
+    {
+        /** Invincibility duration after taking damage (P0-B02). */
+        constexpr inline double invincibility_duration{ 0.75 };
+        constexpr inline double invincibility_blink_interval{ 0.08 };
+        constexpr inline float invincibility_blink_alpha{ 0.35f };
     }
 
     namespace event
