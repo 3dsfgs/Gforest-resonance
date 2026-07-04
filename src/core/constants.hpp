@@ -27,10 +27,17 @@ namespace rl::inline constants
             constexpr inline auto firing_pt{ "FiringPoint" };
         }
 
+        namespace ui
+        {
+            constexpr inline auto heart_hud{ "HeartHud" };
+        }
+
     }
 
     namespace event
     {
+        constexpr inline auto hearts_changed{ "hearts_changed" };
+        constexpr inline auto died{ "died" };
         constexpr inline auto position_changed{ "position_changed" };
         constexpr inline auto entered_area{ "entered_area" };
         constexpr inline auto exited_area{ "exited_area" };

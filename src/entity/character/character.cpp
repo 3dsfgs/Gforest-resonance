@@ -2,6 +2,7 @@
 #include <tuple>
 #include <type_traits>
 #include <vector>
+#include <algorithm>
 
 #include <godot_cpp/classes/input.hpp>
 #include <godot_cpp/classes/marker2d.hpp>
@@ -80,6 +81,7 @@ namespace rl
         this->translate(velocity * this->get_movement_speed() * delta_time);
         this->set_velocity(velocity);
         this->move_and_slide();
+        this->process_slide_collisions();
     }
 
     [[signal_slot]]
@@ -131,5 +133,68 @@ namespace rl
     void Character::set_rotation_speed(const double rotation_speed)
     {
         m_rotation_speed = rotation_speed;
+    }
+
+    bool Character::is_alive() const
+    {
+        return m_health.is_alive();
+    }
+
+    bool Character::take_damage(const int hearts)
+    {
+        if (!m_health.is_alive())
+            return false;
+
+        const int lost = m_health.apply_damage(hearts);
+        if (lost <= 0)
+            return false;
+
+        emit_hearts_changed();
+
+        if (!m_health.is_alive())
+            this->emit_signal(event::died);
+
+        return true;
+    }
+
+    void Character::reset_hearts()
+    {
+        m_health.reset();
+        emit_hearts_changed();
+    }
+
+    void Character::emit_hearts_changed()
+    {
+        this->emit_signal(event::hearts_changed, m_health.hearts, m_health.max_hearts);
+    }
+
+    void Character::process_slide_collisions()
+    {
+    }
+
+    [[property]]
+    int Character::get_hearts() const
+    {
+        return m_health.hearts;
+    }
+
+    [[property]]
+    int Character::get_max_hearts() const
+    {
+        return m_health.max_hearts;
+    }
+
+    [[property]]
+    void Character::set_max_hearts(const int max_hearts)
+    {
+        m_health.set_max(max_hearts);
+        emit_hearts_changed();
+    }
+
+    [[property]]
+    void Character::set_hearts(const int hearts)
+    {
+        m_health.hearts = std::clamp(hearts, 0, m_health.max_hearts);
+        emit_hearts_changed();
     }
 }

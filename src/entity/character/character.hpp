@@ -7,6 +7,7 @@
 #include "core/attributes.hpp"
 #include "core/constants.hpp"
 #include "entity/camera.hpp"
+#include "entity/character/health.hpp"
 #include "singletons/console.hpp"
 #include "util/bind.hpp"
 
@@ -38,7 +39,15 @@ namespace rl
         CharacterController* get_controller() const;
         void set_controller(CharacterController* controller);
 
+        [[nodiscard]] bool is_alive() const;
+        [[nodiscard]] int get_hearts() const;
+        [[nodiscard]] int get_max_hearts() const;
+        bool take_damage(int hearts = 1);
+        void reset_hearts();
+
     protected:
+        virtual void process_slide_collisions();
+        void emit_hearts_changed();
         [[property]] double get_movement_speed() const;
         [[property]] double get_movement_friction() const;
         [[property]] double get_rotation_speed() const;
@@ -46,6 +55,8 @@ namespace rl
         [[property]] void set_movement_speed(const double move_speed);
         [[property]] void set_movement_friction(const double move_friction);
         [[property]] void set_rotation_speed(const double rotation_speed);
+        [[property]] void set_hearts(int hearts);
+        [[property]] void set_max_hearts(int max_hearts);
 
         [[signal_slot]] void on_character_shoot();
         [[signal_slot]] void on_character_rotate(double rotation_angle, double delta_time);
@@ -62,9 +73,17 @@ namespace rl
             bind_property(Character, movement_speed, double);
             bind_property(Character, movement_friction, double);
             bind_property(Character, rotation_speed, double);
+            bind_property(Character, hearts, int);
+            bind_property(Character, max_hearts, int);
+
+            bind_member_function(Character, take_damage);
+            bind_member_function(Character, reset_hearts);
+            bind_member_function(Character, is_alive);
 
             signal_binding<Character, event::position_changed>::add<godot::Object*, godot::Vector2>();
             signal_binding<Character, event::spawn_projectile>::add<godot::Object*, godot::Vector2>();
+            signal_binding<Character, event::hearts_changed>::add<int, int>();
+            signal_binding<Character, event::died>::add<>();
         }
 
     protected:
@@ -83,5 +102,6 @@ namespace rl
         CharacterController* m_character_controller{ nullptr };
         // marker identifying location where to spwwn projectiles
         godot::Marker2D* m_firing_point{ nullptr };
+        HeartHealth m_health{};
     };
 }

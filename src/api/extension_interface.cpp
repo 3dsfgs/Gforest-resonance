@@ -18,6 +18,7 @@
 #include "main.hpp"
 #include "singletons/console.hpp"
 #include "ui/main_dialog.hpp"
+#include "ui/heart_hud.hpp"
 #include "util/engine.hpp"
 
 namespace rl
@@ -55,6 +56,7 @@ namespace rl
 
         godot::ClassDB::register_class<rl::Level>();
         godot::ClassDB::register_class<rl::MainDialog>();
+        godot::ClassDB::register_class<rl::HeartHud>();
         godot::ClassDB::register_class<rl::Main>();
 
         godot::ClassDB::register_class<console>();
