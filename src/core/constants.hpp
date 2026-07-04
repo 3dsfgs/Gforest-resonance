@@ -11,6 +11,12 @@ namespace rl::inline constants
         {
             constexpr inline auto level1{ "Level1" };
             constexpr inline auto physics_box{ "PhysicsBox" };
+            constexpr inline auto spawn_point{ "SpawnPoint" };
+            constexpr inline auto enemy_spawn_prefix{ "EnemySpawn" };
+            constexpr inline auto enemy_spawn1{ "EnemySpawn1" };
+            constexpr inline auto boundaries{ "Boundaries" };
+            constexpr inline auto ground{ "Ground" };
+            constexpr inline auto debug_zones{ "DebugZones" };
         }
 
         namespace dialog
@@ -33,6 +39,14 @@ namespace rl::inline constants
             constexpr inline auto heart_hud{ "HeartHud" };
         }
 
+    }
+
+    namespace level
+    {
+        /** Playable arena size for level1 (pixels). */
+        constexpr inline float playable_width{ 2000.0f };
+        constexpr inline float playable_height{ 1500.0f };
+        constexpr inline float wall_thickness{ 40.0f };
     }
 
     namespace combat
@@ -94,6 +108,7 @@ namespace rl::inline constants
             constexpr inline auto Level1{ "res://scenes/levels/level1.tscn" };
             constexpr inline auto Player{ "res://scenes/characters/player.tscn" };
             constexpr inline auto Bullet{ "res://scenes/projectiles/bullet.tscn" };
+            constexpr inline auto Enemy{ "res://scenes/characters/enemy.tscn" };
         }
 
         namespace ui

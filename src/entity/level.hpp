@@ -45,6 +45,9 @@ namespace rl
                                                            godot::Vector2 location) const;
 
     private:
+        void spawn_player_at_marker();
+        void spawn_enemies_from_markers();
+
         std::atomic<bool> m_active{ false };
         godot::Node* m_background{ nullptr };
         ProjectileSpawner* m_projectile_spawner{ memnew(rl::ProjectileSpawner) };

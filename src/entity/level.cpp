@@ -5,6 +5,7 @@
 #include <godot_cpp/variant/vector2.hpp>
 
 #include "entity/character/character.hpp"
+#include "entity/character/enemy.hpp"
 #include "entity/controller/player_controller.hpp"
 #include "entity/level.hpp"
 #include "singletons/console.hpp"
@@ -25,7 +26,7 @@ namespace rl
 
     void Level::_ready()
     {
-        godot::Node* box{ this->find_child(name::level::physics_box) };
+        godot::Node* box{ this->find_child(name::level::physics_box, true, false) };
         m_physics_box = gdcast<godot::RigidBody2D>(box);
 
         resource::preload::packed_scene<Player> player_scene{ path::scene::Player };
@@ -33,7 +34,9 @@ namespace rl
         m_player->set_controller(memnew(PlayerController));
 
         this->add_child(m_player);
+        this->spawn_player_at_marker();
         this->add_child(m_projectile_spawner);
+        this->spawn_enemies_from_markers();
 
         PlayerController* controller{ gdcast<PlayerController>(m_player->get_controller()) };
         if (controller != nullptr)
@@ -43,6 +46,45 @@ namespace rl
 
             signal<event::spawn_projectile>::connect<Player>(m_player) <=>
                 signal_callback(this, on_player_spawn_projectile);
+        }
+    }
+
+    void Level::spawn_player_at_marker()
+    {
+        if (m_player == nullptr)
+            return;
+
+        godot::Node* spawn_node{ this->find_child(name::level::spawn_point, true, false) };
+        godot::Marker2D* spawn_point{ gdcast<godot::Marker2D>(spawn_node) };
+        if (spawn_point != nullptr)
+            m_player->set_global_position(spawn_point->get_global_position());
+    }
+
+    void Level::spawn_enemies_from_markers()
+    {
+        resource::preload::packed_scene<Enemy> enemy_scene{ path::scene::Enemy };
+
+        const int child_count{ this->get_child_count() };
+        for (int i = 0; i < child_count; ++i)
+        {
+            godot::Node* child{ this->get_child(i) };
+            if (child == nullptr)
+                continue;
+
+            const godot::String child_name{ child->get_name() };
+            if (!child_name.begins_with(name::level::enemy_spawn_prefix))
+                continue;
+
+            godot::Marker2D* marker{ gdcast<godot::Marker2D>(child) };
+            if (marker == nullptr)
+                continue;
+
+            Enemy* enemy{ enemy_scene.instantiate() };
+            if (enemy == nullptr)
+                continue;
+
+            enemy->set_global_position(marker->get_global_position());
+            this->add_child(enemy);
         }
     }
 
