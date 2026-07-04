@@ -49,6 +49,27 @@ namespace rl::inline constants
         constexpr inline float wall_thickness{ 40.0f };
     }
 
+    namespace narrative
+    {
+        /** Seconds between revealed characters (P0-L03). */
+        constexpr inline double char_reveal_interval{ 0.055 };
+        /** Pause after each line before the next (P0-L03). */
+        constexpr inline double line_pause_interval{ 1.4 };
+
+        constexpr inline auto victory_text{
+            "林间恢复了片刻的宁静。\n"
+            "你停下脚步，听见自己的呼吸，轻轻落下。\n"
+            "那些扰人的影子散去了——不是胜利，只是又撑过了一程。" };
+
+        constexpr inline auto defeat_text{
+            "身体先倒下，心却还醒着。\n"
+            "黑暗并不意味着终点，只是提醒你：该慢一点了。\n"
+            "森林不会责备跌倒的人，它只等你再次起身。" };
+
+        constexpr inline auto victory_hint{ "按 R 可重新开始本关" };
+        constexpr inline auto defeat_hint{ "按 R 重新开始" };
+    }
+
     namespace combat
     {
         /** Invincibility duration after taking damage (P0-B02). */

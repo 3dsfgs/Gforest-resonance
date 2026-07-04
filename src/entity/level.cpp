@@ -161,15 +161,6 @@ namespace rl
         this->set_player_input_enabled(false);
 
         this->emit_signal(event::level_state_changed, static_cast<int>(new_state));
-
-        auto console{ console::get() };
-        if (new_state == LevelState::Victory)
-            console->print("{} {}", io::green("level state"), io::green(state_label(new_state)));
-        else
-            console->print("{} {}", io::red("level state"), io::red(state_label(new_state)));
-
-        if (new_state == LevelState::Defeat)
-            console->print("{} {}", io::yellow("press"), io::blue("R to restart"));
     }
 
     void Level::reset_level()
@@ -189,13 +180,15 @@ namespace rl
         this->set_player_input_enabled(true);
         this->spawn_enemies_from_markers();
 
+        this->emit_signal(event::level_state_changed, static_cast<int>(m_state));
+
         auto console{ console::get() };
         console->print("{} {}", io::green("level reset"), io::blue(state_label(m_state)));
     }
 
     void Level::handle_restart_input()
     {
-        if (m_state != LevelState::Defeat)
+        if (m_state != LevelState::Defeat && m_state != LevelState::Victory)
             return;
 
         godot::Input* input_handler{ input::get() };
@@ -218,7 +211,7 @@ namespace rl
         else if (!this->active() && !input::cursor_visible()) [[unlikely]]
             input::show_cursor();
 
-        if (m_state == LevelState::Defeat)
+        if (m_state == LevelState::Defeat || m_state == LevelState::Victory)
             this->handle_restart_input();
 
         this->queue_redraw();
