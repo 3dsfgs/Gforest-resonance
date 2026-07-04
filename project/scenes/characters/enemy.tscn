@@ -5,7 +5,7 @@
 [node name="Enemy" type="Enemy"]
 scale = Vector2(2, 2)
 collision_layer = 2
-collision_mask = 8
+collision_mask = 9
 platform_on_leave = 2
 
 [node name="PlayerCollisionPoly" type="CollisionPolygon2D" parent="."]
@@ -13,7 +13,7 @@ position = Vector2(0.5, -1.5)
 rotation = -1.5708
 polygon = PackedVector2Array(8, 21.5, -21.5, 21.5, -21.5, -21.5, -4.5, -21.5, 8, 1.5)
 
-[node name="EnemySprite" type="Sprite2D" parent="PlayerCollisionPoly"]
+[node name="PlayerSprite" type="Sprite2D" parent="PlayerCollisionPoly"]
 texture = ExtResource("1_oue85")
 
 [node name="FiringPoint" type="Marker2D" parent="PlayerCollisionPoly"]

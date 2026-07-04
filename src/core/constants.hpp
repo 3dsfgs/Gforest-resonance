@@ -58,8 +58,12 @@ namespace rl::inline constants
 
         /** Hearts removed per pulse projectile hit (P0-B03). */
         constexpr inline int projectile_damage_hearts{ 1 };
-        /** Default enemy heart count for pulse testing (P0-B03). */
+        /** Default enemy heart count (P0-B04). */
         constexpr inline int enemy_default_hearts{ 3 };
+        /** Hearts removed when an enemy touches the player (P0-B04). */
+        constexpr inline int enemy_contact_damage_hearts{ 1 };
+        /** Enemy chase speed — slower than default player speed (P0-B04). */
+        constexpr inline double enemy_movement_speed{ 350.0 };
         /** Ricochet self-damage radius from bounce point (pixels). */
         constexpr inline float ricochet_self_damage_radius{ 120.0f };
         constexpr inline int ricochet_self_damage_hearts{ 1 };

@@ -14,6 +14,7 @@ namespace rl
     {
         scene::node::set_unique_name(this, name::character::enemy);
         m_health.set_max(combat::enemy_default_hearts);
+        m_movement_speed = combat::enemy_movement_speed;
     }
 
     void Enemy::_ready()

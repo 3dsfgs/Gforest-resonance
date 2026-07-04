@@ -9,12 +9,14 @@ namespace godot
 
 namespace rl
 {
+    class Player;
+
     class EnemyController : public CharacterController
     {
         GDCLASS(EnemyController, CharacterController);
 
     public:
-        EnemyController() = default;
+        EnemyController();
         ~EnemyController() = default;
 
         void process_action_input(godot::Input* const input, double delta_time) override;
@@ -25,5 +27,8 @@ namespace rl
         static void _bind_methods()
         {
         }
+
+    private:
+        [[nodiscard]] Player* find_player() const;
     };
 }

@@ -3,6 +3,7 @@
 
 #include "core/constants.hpp"
 #include "entity/character/character.hpp"
+#include "entity/character/enemy.hpp"
 #include "entity/character/player.hpp"
 #include "singletons/console.hpp"
 #include "util/conversions.hpp"
@@ -40,6 +41,16 @@ namespace rl
 
             const uint64_t id{ collider->get_instance_id() };
             touching.insert(id);
+
+            if (Enemy* enemy{ godot::Object::cast_to<Enemy>(collider) })
+            {
+                if (take_damage(combat::enemy_contact_damage_hearts))
+                {
+                    console::get()->print("{} {}", io::red("enemy contact"),
+                                          io::yellow("-1 heart"));
+                }
+                continue;
+            }
 
             if (!m_active_zone_colliders.contains(id))
                 handle_zone_contact(gdcast<godot::PhysicsBody2D>(collider));

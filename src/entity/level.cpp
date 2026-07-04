@@ -6,6 +6,7 @@
 
 #include "entity/character/character.hpp"
 #include "entity/character/enemy.hpp"
+#include "entity/controller/enemy_controller.hpp"
 #include "entity/controller/player_controller.hpp"
 #include "entity/level.hpp"
 #include "singletons/console.hpp"
@@ -83,6 +84,7 @@ namespace rl
             if (enemy == nullptr)
                 continue;
 
+            enemy->set_controller(memnew(EnemyController));
             enemy->set_global_position(marker->get_global_position());
             this->add_child(enemy);
         }
