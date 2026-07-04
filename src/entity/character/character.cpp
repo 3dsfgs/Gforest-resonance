@@ -48,8 +48,6 @@ namespace rl
             this->find_child(name::character::sprite, true, false));
 
         runtime_assert(m_firing_point != nullptr);
-        if (!engine::editor_active())
-            runtime_assert(m_character_controller != nullptr);
 
         if (m_character_controller != nullptr)
         {

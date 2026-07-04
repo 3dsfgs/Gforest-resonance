@@ -4,6 +4,11 @@
 #include "entity/character/character.hpp"
 #include "util/bind.hpp"
 
+namespace godot
+{
+    class Node;
+}
+
 namespace rl
 {
     class Enemy : public Character
@@ -13,9 +18,11 @@ namespace rl
     public:
         Enemy();
 
-        using Character::_ready;
+        void _ready() override;
 
     protected:
         static void _bind_methods();
+
+        [[signal_slot]] void on_died();
     };
 }

@@ -4,10 +4,16 @@
 #include <godot_cpp/variant/vector2.hpp>
 
 #include "core/attributes.hpp"
+#include "core/constants.hpp"
 #include "singletons/console.hpp"
 #include "util/bind.hpp"
 #include "util/conversions.hpp"
 #include "util/io.hpp"
+
+namespace godot
+{
+    class Node;
+}
 
 namespace rl
 {
@@ -47,10 +53,16 @@ namespace rl
             bind_member_function(Projectile, set_max_travel_dist);
             bind_member_function(Projectile, set_acceleration);
             bind_member_function(Projectile, set_velocity);
+            bind_member_function(Projectile, on_body_entered);
         }
+
+        [[signal_slot]] void on_body_entered(godot::Node* body);
 
     protected:
         godot::Vector2 m_start_pos{ 0.0, 0.0 };
+        godot::Vector2 m_bounce_point{ 0.0, 0.0 };
+        bool m_hit{ false };
+        bool m_has_bounced{ false };
         // projectile movement velocity (pixels)
         double m_velocity{ 1500 };
         // projectile movement speed (pixels/s)

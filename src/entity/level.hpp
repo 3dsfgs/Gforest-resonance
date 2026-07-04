@@ -40,8 +40,6 @@ namespace rl
     protected:
         static void _bind_methods();
 
-        [[signal_slot]] void on_physics_box_entered(godot::Node* node) const;
-        [[signal_slot]] void on_physics_box_exited(godot::Node* node) const;
         [[signal_slot]] void on_player_spawn_projectile(godot::Node* obj);
         [[signal_slot]] void on_character_position_changed(const godot::Object* const obj,
                                                            godot::Vector2 location) const;

@@ -1,10 +1,11 @@
-[gd_scene load_steps=7 format=3 uid="uid://c8tur70b73kih"]
+[gd_scene load_steps=8 format=3 uid="uid://c8tur70b73kih"]
 
 [ext_resource type="Texture2D" path="res://assets/art/prototype_textures/light/texture_03.png" id="1_nl15v"]
 [ext_resource type="Texture2D" path="res://assets/art/prototype_textures/dark/texture_04.png" id="2_6qqh6"]
 [ext_resource type="Texture2D" path="res://assets/art/prototype_textures/red/texture_02.png" id="3_blm5m"]
 [ext_resource type="Texture2D" path="res://assets/art/prototype_textures/green/texture_10.png" id="4_ix12c"]
 [ext_resource type="Texture2D" path="res://assets/art/prototype_textures/purple/texture_02.png" id="5_pmdlb"]
+[ext_resource type="PackedScene" uid="uid://drwc32sap2ko6" path="res://scenes/characters/enemy.tscn" id="6_enemy"]
 
 [sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_d0buj"]
 resource_local_to_scene = true
@@ -95,3 +96,6 @@ texture = ExtResource("5_pmdlb")
 z_index = -1
 scale = Vector2(0.25, 0.25)
 occluder = SubResource("OccluderPolygon2D_d0buj")
+
+[node name="TestEnemy" parent="." instance=ExtResource("6_enemy")]
+position = Vector2(0, 200)

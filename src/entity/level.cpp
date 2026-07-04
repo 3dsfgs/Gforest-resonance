@@ -78,16 +78,10 @@ namespace rl
         return m_active;
     }
 
-    [[signal_slot]]
-    void Level::on_physics_box_entered(godot::Node* node) const
+    void Level::_bind_methods()
     {
-        console::get()->print("{} > {}", io::yellow("projectile"), to<std::string>(node->get_name()));
-    }
-
-    [[signal_slot]]
-    void Level::on_physics_box_exited(godot::Node* node) const
-    {
-        console::get()->print("{} < {}", io::red("projectile"), to<std::string>(node->get_name()));
+        bind_member_function(Level, on_character_position_changed);
+        bind_member_function(Level, on_player_spawn_projectile);
     }
 
     [[signal_slot]]
@@ -101,12 +95,6 @@ namespace rl
             {
                 projectile->set_position(firing_pt->get_global_position());
                 projectile->set_rotation(firing_pt->get_global_rotation());
-
-                signal<event::body_entered>::connect<Projectile>(projectile) <=>
-                    signal_callback(this, on_physics_box_entered);
-
-                signal<event::body_exited>::connect<Projectile>(projectile) <=>
-                    signal_callback(this, on_physics_box_exited);
             }
 
             this->add_child(projectile);
@@ -121,13 +109,5 @@ namespace rl
         auto console{ console::get() };
         console->print("{} ({},{})", io::green(to<std::string>(node->get_class()) + " location: "),
                        io::orange(location.x), io::orange(location.y));
-    }
-
-    void Level::_bind_methods()
-    {
-        bind_member_function(Level, on_character_position_changed);
-        bind_member_function(Level, on_player_spawn_projectile);
-        bind_member_function(Level, on_physics_box_entered);
-        bind_member_function(Level, on_physics_box_exited);
     }
 }

@@ -41,6 +41,14 @@ namespace rl::inline constants
         constexpr inline double invincibility_duration{ 0.75 };
         constexpr inline double invincibility_blink_interval{ 0.08 };
         constexpr inline float invincibility_blink_alpha{ 0.35f };
+
+        /** Hearts removed per pulse projectile hit (P0-B03). */
+        constexpr inline int projectile_damage_hearts{ 1 };
+        /** Default enemy heart count for pulse testing (P0-B03). */
+        constexpr inline int enemy_default_hearts{ 3 };
+        /** Ricochet self-damage radius from bounce point (pixels). */
+        constexpr inline float ricochet_self_damage_radius{ 120.0f };
+        constexpr inline int ricochet_self_damage_hearts{ 1 };
     }
 
     namespace event
