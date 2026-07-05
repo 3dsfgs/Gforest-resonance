@@ -126,6 +126,41 @@ namespace rl::inline constants
         Layer16 = 0x00008000,
     };
 
+    /**
+     * Physics collision matrix (P0-B06).
+     * Layer names are registered in project.godot [layer_names].
+     *
+     * | Entity       | layer (LayerID)   | mask includes                          | scene value |
+     * |--------------|-------------------|----------------------------------------|-------------|
+     * | Player       | Player            | Walls, DamageZones, DeathZones, NPCs   | mask 58     |
+     * | Enemy        | NPCs              | Walls, Player                          | mask 9      |
+     * | Projectile   | Projectiles       | Walls, NPCs                            | mask 10     |
+     * | Projectile*  | Projectiles       | + PhysicsObjects (B03 ricochet debug)  | mask 74     |
+     * | Walls        | Walls             | —                                      | mask 0      |
+     * | DamageZones  | DamageZones       | —                                      | mask 0      |
+     * | DeathZones   | DeathZones        | —                                      | mask 0      |
+     *
+     * *After wall/box ricochet, Projectile runtime-adds Player to mask for self-damage.
+     */
+    namespace collision
+    {
+        constexpr inline uint32_t player_layer{ static_cast<uint32_t>(LayerID::Player) };
+        constexpr inline uint32_t enemy_layer{ static_cast<uint32_t>(LayerID::NPCs) };
+        constexpr inline uint32_t projectile_layer{ static_cast<uint32_t>(LayerID::Projectiles) };
+        constexpr inline uint32_t walls_layer{ static_cast<uint32_t>(LayerID::Walls) };
+
+        constexpr inline uint32_t player_mask{
+            static_cast<uint32_t>(LayerID::Walls) | static_cast<uint32_t>(LayerID::DamageZones) |
+            static_cast<uint32_t>(LayerID::DeathZones) | static_cast<uint32_t>(LayerID::NPCs) };
+        constexpr inline uint32_t enemy_mask{ static_cast<uint32_t>(LayerID::Walls) |
+                                              static_cast<uint32_t>(LayerID::Player) };
+        constexpr inline uint32_t projectile_mask{ static_cast<uint32_t>(LayerID::Walls) |
+                                                   static_cast<uint32_t>(LayerID::NPCs) };
+        /** B03 ricochet off DebugZones/PhysicsBox — used in bullet.tscn. */
+        constexpr inline uint32_t projectile_mask_ricochet{
+            projectile_mask | static_cast<uint32_t>(LayerID::PhysicsObjects) };
+    }
+
     namespace path
 
     {

@@ -83,8 +83,7 @@ namespace rl
                 {
                     m_has_bounced = true;
                     m_bounce_point = this->get_global_position();
-                    this->set_collision_mask(this->get_collision_mask() |
-                                             static_cast<uint32_t>(LayerID::Player));
+                    this->set_collision_mask(this->get_collision_mask() | collision::player_layer);
                 }
             }
         }
