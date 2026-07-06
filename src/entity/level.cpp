@@ -1,3 +1,4 @@
+#include <godot_cpp/classes/camera2d.hpp>
 #include <godot_cpp/classes/collision_polygon2d.hpp>
 #include <godot_cpp/classes/marker2d.hpp>
 #include <godot_cpp/classes/rigid_body2d.hpp>
@@ -57,6 +58,7 @@ namespace rl
         this->spawn_player_at_marker();
         this->add_child(m_projectile_spawner);
         this->spawn_enemies_from_markers();
+        this->apply_room_camera_limits();
 
         signal<event::died>::connect<Player>(m_player) <=> signal_callback(this, on_player_died);
 
@@ -117,6 +119,24 @@ namespace rl
             signal<event::died>::connect<Enemy>(enemy) <=> signal_callback(this, on_enemy_died);
             ++m_enemy_count;
         }
+    }
+
+    void Level::apply_room_camera_limits()
+    {
+        if (m_player == nullptr)
+            return;
+
+        godot::Node* camera_node{
+            m_player->find_child(name::level::player_camera, true, false) };
+        godot::Camera2D* camera{ gdcast<godot::Camera2D>(camera_node) };
+        if (camera == nullptr)
+            return;
+
+        camera->set("limit_smoothed", true);
+        camera->set("limit_left", static_cast<int>(-level::half_playable_width));
+        camera->set("limit_right", static_cast<int>(level::half_playable_width));
+        camera->set("limit_top", static_cast<int>(-level::half_playable_height));
+        camera->set("limit_bottom", static_cast<int>(level::half_playable_height));
     }
 
     void Level::clear_enemies()

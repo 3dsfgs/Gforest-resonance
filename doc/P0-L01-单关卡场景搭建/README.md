@@ -9,7 +9,7 @@
 
 ## 概述
 
-本次实现 MVP **M6 单张关卡**，将原先分散的测试块重组为一张可玩的矩形森林区域：
+本次实现 MVP **M6 单张可玩区域**（L01）；v0.2 起该区域定义为 **Room Template v0 第一间森林房**（见 [P0-L04](../P0-L04-森林房间模板/README.md)），玩法尺寸仍为 2000×1500。
 
 - **2000×1500 px** 活动区（`ColorRect` 地面 + 四面 `StaticBody2D` 围墙）
 - **`SpawnPoint`** 标记玩家出生点，`Level::_ready` 读取位置而非硬编码
@@ -164,5 +164,5 @@ Level1 (Level)
 | P0-B04 敌人 AI | 在 `spawn_enemies_from_markers` 中为敌人挂载 `EnemyController` |
 | P0-B05 + L02 | 监听玩家 `died`、统计存活敌人数，状态机切换 |
 | P0-B06 碰撞层整理 | 玩家 mask 需加入 `NPCs` 以支持接触伤害 |
-| P0-L04 视差背景 | 在 `Ground` 之上叠加 `ParallaxBackground` |
+| P0-L04 森林房间模板 | L01 场景演进为 Room Template v0；见 [P0-L04](../P0-L04-森林房间模板/README.md) |
 | P0-L07 MVP 走测 | 以本关卡为完整闭环主场景 |

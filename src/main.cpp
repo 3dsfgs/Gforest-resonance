@@ -21,9 +21,12 @@ namespace rl
             m_canvas_layer = gdcast<godot::CanvasLayer>(
                 m_main_dialog->find_child(name::dialog::canvas_layer, true, false));
 
-            runtime_assert(m_canvas_layer != nullptr);
-            if (m_active_level != nullptr && m_canvas_layer != nullptr)
-                m_canvas_layer->add_child(m_active_level);
+            godot::SubViewport* game_viewport{ gdcast<godot::SubViewport>(
+                m_main_dialog->find_child(name::dialog::game_sub_viewport, true, false)) };
+
+            runtime_assert(game_viewport != nullptr);
+            if (m_active_level != nullptr && game_viewport != nullptr)
+                game_viewport->add_child(m_active_level);
 
             if (m_main_dialog != nullptr)
                 this->add_child(m_main_dialog);

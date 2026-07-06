@@ -63,6 +63,7 @@ namespace rl
         void transition_to_state(LevelState new_state);
         void reset_level();
         void handle_restart_input();
+        void apply_room_camera_limits();
 
         std::atomic<bool> m_active{ false };
         LevelState m_state{ LevelState::Playing };

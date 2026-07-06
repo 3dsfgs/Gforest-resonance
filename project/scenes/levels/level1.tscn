@@ -1,7 +1,9 @@
-[gd_scene load_steps=8 format=3 uid="uid://c8tur70b73kih"]
+[gd_scene load_steps=10 format=3 uid="uid://c8tur70b73kih"]
 
 [ext_resource type="Texture2D" path="res://assets/art/prototype_textures/red/texture_02.png" id="1_death"]
 [ext_resource type="Texture2D" path="res://assets/art/prototype_textures/green/texture_10.png" id="2_damage"]
+[ext_resource type="Texture2D" path="res://assets/parallax/parallax_far.png" id="4_ground"]
+[ext_resource type="Texture2D" path="res://assets/parallax/parallax_mid.png" id="5_fog"]
 [ext_resource type="Texture2D" path="res://assets/art/prototype_textures/purple/texture_02.png" id="3_physics"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
@@ -17,12 +19,26 @@ polygon = PackedVector2Array(512, -512, -512, -512, -512, 512, 512, 512)
 [node name="Level1" type="Level"]
 
 [node name="Ground" type="ColorRect" parent="."]
-z_index = -10
+z_index = -30
+light_mask = 0
 offset_left = -1000.0
 offset_top = -750.0
 offset_right = 1000.0
 offset_bottom = 750.0
 color = Color(0.176471, 0.411765, 0.235294, 1)
+
+[node name="GroundSprite" type="Sprite2D" parent="."]
+z_index = -20
+light_mask = 0
+scale = Vector2(1.5948965, 1.1961722)
+texture = ExtResource("4_ground")
+
+[node name="FogOverlay" type="Sprite2D" parent="."]
+z_index = -10
+light_mask = 0
+modulate = Color(1, 1, 1, 0.38)
+scale = Vector2(1.953125, 1.4648438)
+texture = ExtResource("5_fog")
 
 [node name="DirectionalLight2D" type="DirectionalLight2D" parent="."]
 color = Color(1, 0.94902, 0.960784, 1)

@@ -17,13 +17,16 @@ namespace rl::inline constants
             constexpr inline auto boundaries{ "Boundaries" };
             constexpr inline auto ground{ "Ground" };
             constexpr inline auto debug_zones{ "DebugZones" };
+            constexpr inline auto ground_sprite{ "GroundSprite" };
+            constexpr inline auto fog_overlay{ "FogOverlay" };
+            constexpr inline auto player_camera{ "PlayerCamera" };
         }
 
         namespace dialog
         {
             constexpr inline auto console{ "ConsolePanel" };
             constexpr inline auto canvas_layer{ "MainCanvasLayer" };
-
+            constexpr inline auto game_sub_viewport{ "MainSubViewport" };
         }
 
         namespace character
@@ -43,10 +46,23 @@ namespace rl::inline constants
 
     namespace level
     {
-        /** Playable arena size for level1 (pixels). */
+        /**
+         * Room Template v0 — first forest clearing (元气骑士式单房，见 doc/P0-L04-森林房间模板).
+         * L01 的 level1.tscn 即本房间；P1 起扩展为多房连通。
+         */
         constexpr inline float playable_width{ 2000.0f };
         constexpr inline float playable_height{ 1500.0f };
         constexpr inline float wall_thickness{ 40.0f };
+        constexpr inline float half_playable_width{ playable_width * 0.5f };
+        constexpr inline float half_playable_height{ playable_height * 0.5f };
+
+        constexpr inline float ground_texture_size{ 1254.0f };
+        constexpr inline float fog_texture_size{ 1024.0f };
+        constexpr inline float ground_sprite_scale_x{ playable_width / ground_texture_size };
+        constexpr inline float ground_sprite_scale_y{ playable_height / ground_texture_size };
+        constexpr inline float fog_overlay_scale_x{ playable_width / fog_texture_size };
+        constexpr inline float fog_overlay_scale_y{ playable_height / fog_texture_size };
+        constexpr inline float fog_overlay_alpha{ 0.38f };
     }
 
     namespace narrative
@@ -166,10 +182,17 @@ namespace rl::inline constants
     {
         namespace scene
         {
+            /** Room Template v0 — forest clearing; runtime root仍为 Level1。 */
             constexpr inline auto Level1{ "res://scenes/levels/level1.tscn" };
             constexpr inline auto Player{ "res://scenes/characters/player.tscn" };
             constexpr inline auto Bullet{ "res://scenes/projectiles/bullet.tscn" };
             constexpr inline auto Enemy{ "res://scenes/characters/enemy.tscn" };
+        }
+
+        namespace room_assets
+        {
+            constexpr inline auto ground{ "res://assets/parallax/parallax_far.png" };
+            constexpr inline auto fog_overlay{ "res://assets/parallax/parallax_mid.png" };
         }
 
         namespace ui
