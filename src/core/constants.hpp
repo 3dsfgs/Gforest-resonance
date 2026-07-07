@@ -18,7 +18,9 @@ namespace rl::inline constants
             constexpr inline auto ground{ "Ground" };
             constexpr inline auto debug_zones{ "DebugZones" };
             constexpr inline auto ground_sprite{ "GroundSprite" };
+            constexpr inline auto near_overlay{ "NearOverlay" };
             constexpr inline auto fog_overlay{ "FogOverlay" };
+            constexpr inline auto room_decor{ "RoomDecor" };
             constexpr inline auto player_camera{ "PlayerCamera" };
         }
 
@@ -58,11 +60,17 @@ namespace rl::inline constants
 
         constexpr inline float ground_texture_size{ 1254.0f };
         constexpr inline float fog_texture_size{ 1024.0f };
+        constexpr inline float near_texture_size{ 1024.0f };
         constexpr inline float ground_sprite_scale_x{ playable_width / ground_texture_size };
         constexpr inline float ground_sprite_scale_y{ playable_height / ground_texture_size };
         constexpr inline float fog_overlay_scale_x{ playable_width / fog_texture_size };
         constexpr inline float fog_overlay_scale_y{ playable_height / fog_texture_size };
+        constexpr inline float near_overlay_scale_x{ playable_width / near_texture_size };
+        constexpr inline float near_overlay_scale_y{ playable_height / near_texture_size };
         constexpr inline float fog_overlay_alpha{ 0.38f };
+        constexpr inline float near_overlay_alpha{ 0.72f };
+        constexpr inline float door_opening_width{ 220.0f };
+        constexpr inline float wall_visual_depth{ 72.0f };
     }
 
     namespace narrative
@@ -182,7 +190,7 @@ namespace rl::inline constants
     {
         namespace scene
         {
-            /** Room Template v0 — forest clearing; runtime root仍为 Level1。 */
+            /** Room Template v0 — forest clearing; runtime root 仍为 Level1。 */
             constexpr inline auto Level1{ "res://scenes/levels/level1.tscn" };
             constexpr inline auto Player{ "res://scenes/characters/player.tscn" };
             constexpr inline auto Bullet{ "res://scenes/projectiles/bullet.tscn" };
@@ -193,6 +201,7 @@ namespace rl::inline constants
         {
             constexpr inline auto ground{ "res://assets/parallax/parallax_far.png" };
             constexpr inline auto fog_overlay{ "res://assets/parallax/parallax_mid.png" };
+            constexpr inline auto near_overlay{ "res://assets/parallax/parallax_near.png" };
         }
 
         namespace ui

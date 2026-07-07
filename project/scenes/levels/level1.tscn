@@ -1,10 +1,12 @@
-[gd_scene load_steps=10 format=3 uid="uid://c8tur70b73kih"]
+[gd_scene load_steps=14 format=3 uid="uid://c8tur70b73kih"]
 
 [ext_resource type="Texture2D" path="res://assets/art/prototype_textures/red/texture_02.png" id="1_death"]
 [ext_resource type="Texture2D" path="res://assets/art/prototype_textures/green/texture_10.png" id="2_damage"]
+[ext_resource type="Texture2D" path="res://assets/art/prototype_textures/purple/texture_02.png" id="3_physics"]
 [ext_resource type="Texture2D" path="res://assets/parallax/parallax_far.png" id="4_ground"]
 [ext_resource type="Texture2D" path="res://assets/parallax/parallax_mid.png" id="5_fog"]
-[ext_resource type="Texture2D" path="res://assets/art/prototype_textures/purple/texture_02.png" id="3_physics"]
+[ext_resource type="Texture2D" path="res://assets/parallax/parallax_near.png" id="6_near"]
+[ext_resource type="Texture2D" path="res://assets/art/prototype_textures/red/texture_10.png" id="7_torch"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
 size = Vector2(2040, 40)
@@ -15,6 +17,21 @@ size = Vector2(40, 1540)
 [sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_d0buj"]
 resource_local_to_scene = true
 polygon = PackedVector2Array(512, -512, -512, -512, -512, 512, 512, 512)
+
+[sub_resource type="Gradient" id="Gradient_torch"]
+offsets = PackedFloat32Array(0, 0.65, 1)
+colors = PackedColorArray(1, 0.82, 0.45, 1, 1, 0.55, 0.2, 0.6, 0, 0, 0, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_torch"]
+gradient = SubResource("Gradient_torch")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+
+[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_wall_top_left"]
+polygon = PackedVector2Array(-1000, -750, 110, -750, 110, -678, -1000, -678)
+
+[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_wall_top_right"]
+polygon = PackedVector2Array(330, -750, 1000, -750, 1000, -678, 330, -678)
 
 [node name="Level1" type="Level"]
 
@@ -40,14 +57,238 @@ modulate = Color(1, 1, 1, 0.38)
 scale = Vector2(1.953125, 1.4648438)
 texture = ExtResource("5_fog")
 
+[node name="NearOverlay" type="Sprite2D" parent="."]
+z_index = -5
+light_mask = 0
+modulate = Color(1, 1, 1, 0.72)
+scale = Vector2(1.953125, 1.4648438)
+texture = ExtResource("6_near")
+
 [node name="DirectionalLight2D" type="DirectionalLight2D" parent="."]
-color = Color(1, 0.94902, 0.960784, 1)
-energy = 0.75
+color = Color(0.86, 0.92, 0.84, 1)
+energy = 0.45
 blend_mode = 1
 range_z_min = -100
 range_z_max = 100
-range_layer_max = 1
+range_layer_max = 100
 max_distance = 1000.0
+
+[node name="RoomDecor" type="Node2D" parent="."]
+
+[node name="WallVisuals" type="Node2D" parent="RoomDecor"]
+
+[node name="WallTopLeft" type="ColorRect" parent="RoomDecor/WallVisuals"]
+z_index = 1
+offset_left = -1000.0
+offset_top = -750.0
+offset_right = -110.0
+offset_bottom = -678.0
+color = Color(0.12, 0.2, 0.11, 0.92)
+
+[node name="WallTopRight" type="ColorRect" parent="RoomDecor/WallVisuals"]
+z_index = 1
+offset_left = 110.0
+offset_top = -750.0
+offset_right = 1000.0
+offset_bottom = -678.0
+color = Color(0.12, 0.2, 0.11, 0.92)
+
+[node name="WallBottomLeft" type="ColorRect" parent="RoomDecor/WallVisuals"]
+z_index = 1
+offset_left = -1000.0
+offset_top = 678.0
+offset_right = -110.0
+offset_bottom = 750.0
+color = Color(0.12, 0.2, 0.11, 0.92)
+
+[node name="WallBottomRight" type="ColorRect" parent="RoomDecor/WallVisuals"]
+z_index = 1
+offset_left = 110.0
+offset_top = 678.0
+offset_right = 1000.0
+offset_bottom = 750.0
+color = Color(0.12, 0.2, 0.11, 0.92)
+
+[node name="WallLeftTop" type="ColorRect" parent="RoomDecor/WallVisuals"]
+z_index = 1
+offset_left = -1000.0
+offset_top = -750.0
+offset_right = -928.0
+offset_bottom = -110.0
+color = Color(0.1, 0.17, 0.09, 0.92)
+
+[node name="WallLeftBottom" type="ColorRect" parent="RoomDecor/WallVisuals"]
+z_index = 1
+offset_left = -1000.0
+offset_top = 110.0
+offset_right = -928.0
+offset_bottom = 750.0
+color = Color(0.1, 0.17, 0.09, 0.92)
+
+[node name="WallRightTop" type="ColorRect" parent="RoomDecor/WallVisuals"]
+z_index = 1
+offset_left = 928.0
+offset_top = -750.0
+offset_right = 1000.0
+offset_bottom = -110.0
+color = Color(0.1, 0.17, 0.09, 0.92)
+
+[node name="WallRightBottom" type="ColorRect" parent="RoomDecor/WallVisuals"]
+z_index = 1
+offset_left = 928.0
+offset_top = 110.0
+offset_right = 1000.0
+offset_bottom = 750.0
+color = Color(0.1, 0.17, 0.09, 0.92)
+
+[node name="WallTopOccluderLeft" type="LightOccluder2D" parent="RoomDecor/WallVisuals"]
+occluder = SubResource("OccluderPolygon2D_wall_top_left")
+
+[node name="WallTopOccluderRight" type="LightOccluder2D" parent="RoomDecor/WallVisuals"]
+occluder = SubResource("OccluderPolygon2D_wall_top_right")
+
+[node name="Doors" type="Node2D" parent="RoomDecor"]
+
+[node name="DoorNorth" type="Node2D" parent="RoomDecor/Doors"]
+position = Vector2(0, -714)
+
+[node name="DoorFrameLeft" type="ColorRect" parent="RoomDecor/Doors/DoorNorth"]
+offset_left = -110.0
+offset_top = -36.0
+offset_right = -90.0
+offset_bottom = 36.0
+color = Color(0.28, 0.18, 0.1, 1)
+
+[node name="DoorFrameRight" type="ColorRect" parent="RoomDecor/Doors/DoorNorth"]
+offset_left = 90.0
+offset_top = -36.0
+offset_right = 110.0
+offset_bottom = 36.0
+color = Color(0.28, 0.18, 0.1, 1)
+
+[node name="DoorArch" type="ColorRect" parent="RoomDecor/Doors/DoorNorth"]
+offset_left = -90.0
+offset_top = -42.0
+offset_right = 90.0
+offset_bottom = -24.0
+color = Color(0.22, 0.14, 0.08, 0.85)
+
+[node name="DoorSouth" type="Node2D" parent="RoomDecor/Doors"]
+position = Vector2(0, 714)
+
+[node name="DoorFrameLeft" type="ColorRect" parent="RoomDecor/Doors/DoorSouth"]
+offset_left = -110.0
+offset_top = -36.0
+offset_right = -90.0
+offset_bottom = 36.0
+color = Color(0.28, 0.18, 0.1, 1)
+
+[node name="DoorFrameRight" type="ColorRect" parent="RoomDecor/Doors/DoorSouth"]
+offset_left = 90.0
+offset_top = -36.0
+offset_right = 110.0
+offset_bottom = 36.0
+color = Color(0.28, 0.18, 0.1, 1)
+
+[node name="DoorWest" type="Node2D" parent="RoomDecor/Doors"]
+position = Vector2(-964, 0)
+
+[node name="DoorFrameTop" type="ColorRect" parent="RoomDecor/Doors/DoorWest"]
+offset_left = -36.0
+offset_top = -110.0
+offset_right = 36.0
+offset_bottom = -90.0
+color = Color(0.28, 0.18, 0.1, 1)
+
+[node name="DoorFrameBottom" type="ColorRect" parent="RoomDecor/Doors/DoorWest"]
+offset_left = -36.0
+offset_top = 90.0
+offset_right = 36.0
+offset_bottom = 110.0
+color = Color(0.28, 0.18, 0.1, 1)
+
+[node name="DoorEast" type="Node2D" parent="RoomDecor/Doors"]
+position = Vector2(964, 0)
+
+[node name="DoorFrameTop" type="ColorRect" parent="RoomDecor/Doors/DoorEast"]
+offset_left = -36.0
+offset_top = -110.0
+offset_right = 36.0
+offset_bottom = -90.0
+color = Color(0.28, 0.18, 0.1, 1)
+
+[node name="DoorFrameBottom" type="ColorRect" parent="RoomDecor/Doors/DoorEast"]
+offset_left = -36.0
+offset_top = 90.0
+offset_right = 36.0
+offset_bottom = 110.0
+color = Color(0.28, 0.18, 0.1, 1)
+
+[node name="Torches" type="Node2D" parent="RoomDecor"]
+
+[node name="TorchNW" type="Node2D" parent="RoomDecor/Torches"]
+position = Vector2(-860, -620)
+
+[node name="TorchSprite" type="Sprite2D" parent="RoomDecor/Torches/TorchNW"]
+scale = Vector2(0.12, 0.12)
+texture = ExtResource("7_torch")
+
+[node name="TorchLight" type="PointLight2D" parent="RoomDecor/Torches/TorchNW"]
+color = Color(1, 0.72, 0.38, 1)
+energy = 1.35
+shadow_enabled = true
+shadow_color = Color(0, 0, 0, 0.88)
+shadow_filter = 2
+texture = SubResource("GradientTexture2D_torch")
+texture_scale = 3.5
+
+[node name="TorchNE" type="Node2D" parent="RoomDecor/Torches"]
+position = Vector2(860, -620)
+
+[node name="TorchSprite" type="Sprite2D" parent="RoomDecor/Torches/TorchNE"]
+scale = Vector2(0.12, 0.12)
+texture = ExtResource("7_torch")
+
+[node name="TorchLight" type="PointLight2D" parent="RoomDecor/Torches/TorchNE"]
+color = Color(1, 0.72, 0.38, 1)
+energy = 1.35
+shadow_enabled = true
+shadow_color = Color(0, 0, 0, 0.88)
+shadow_filter = 2
+texture = SubResource("GradientTexture2D_torch")
+texture_scale = 3.5
+
+[node name="TorchSW" type="Node2D" parent="RoomDecor/Torches"]
+position = Vector2(-860, 620)
+
+[node name="TorchSprite" type="Sprite2D" parent="RoomDecor/Torches/TorchSW"]
+scale = Vector2(0.12, 0.12)
+texture = ExtResource("7_torch")
+
+[node name="TorchLight" type="PointLight2D" parent="RoomDecor/Torches/TorchSW"]
+color = Color(1, 0.72, 0.38, 1)
+energy = 1.35
+shadow_enabled = true
+shadow_color = Color(0, 0, 0, 0.88)
+shadow_filter = 2
+texture = SubResource("GradientTexture2D_torch")
+texture_scale = 3.5
+
+[node name="TorchSE" type="Node2D" parent="RoomDecor/Torches"]
+position = Vector2(860, 620)
+
+[node name="TorchSprite" type="Sprite2D" parent="RoomDecor/Torches/TorchSE"]
+scale = Vector2(0.12, 0.12)
+texture = ExtResource("7_torch")
+
+[node name="TorchLight" type="PointLight2D" parent="RoomDecor/Torches/TorchSE"]
+color = Color(1, 0.72, 0.38, 1)
+energy = 1.35
+shadow_enabled = true
+shadow_color = Color(0, 0, 0, 0.88)
+shadow_filter = 2
+texture = SubResource("GradientTexture2D_torch")
+texture_scale = 3.5
 
 [node name="Boundaries" type="Node2D" parent="."]
 
