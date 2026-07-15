@@ -39,7 +39,7 @@ namespace rl
     void Character::_ready()
     {
         this->add_child(m_camera);
-        //m_camera->make_current();
+        m_camera->make_current();
         this->set_process(false);
 
         m_firing_point = gdcast<godot::Marker2D>(
