@@ -113,7 +113,7 @@ namespace rl::inline constants
         constexpr inline float ricochet_self_damage_radius{ 120.0f };
         constexpr inline int ricochet_self_damage_hearts{ 1 };
 
-        /** Day1 打击感：命中闪色时长（玩家/敌人共用时长，颜色分开）。 */
+        /** Day1 打击感：命中闪色时长（玩家/敌人共用时长，颜色分开）。敌人的无敌帧可能后续需要修改 */
         constexpr inline double hit_flash_duration{ 0.12 };
         /** 敌人被打：青白闪（打击确认，不震屏）。 */
         constexpr inline float enemy_hit_flash_r{ 4.0f };
@@ -128,6 +128,17 @@ namespace rl::inline constants
         constexpr inline float hit_shake_trauma{ 0.7f };
         constexpr inline float camera_shake_max_offset{ 22.0f };
         constexpr inline float camera_shake_decay{ 2.0f };
+
+        /** Day2 打击感：击杀爆炸序列帧数量（simple/simpleexplosion00..08）。 */
+        constexpr inline int kill_explosion_frame_count{ 9 };
+        constexpr inline double kill_explosion_fps{ 18.0 };
+        constexpr inline float kill_explosion_scale{ 1.35f };
+        constexpr inline int kill_explosion_z_index{ 12 };
+
+        /** Day2 音效音量（dB）。0 dB 为基准响度。 */
+        constexpr inline float sfx_enemy_hit_volume_db{ 0.0f };
+        constexpr inline float sfx_enemy_kill_volume_db{ 0.0f };
+        constexpr inline float sfx_player_hurt_volume_db{ 0.0f };
     }
 
     namespace event
@@ -223,6 +234,23 @@ namespace rl::inline constants
         namespace ui
         {
             constexpr inline auto MainDialog{ "res://scenes/ui/main_dialog.tscn" };
+        }
+
+        namespace audio
+        {
+            /** Kenney retro pack — pulse hit confirm. */
+            constexpr inline auto enemy_hit{ "res://assets/audio/sfx/retro/hit2.ogg" };
+            /** Kenney retro pack — enemy defeat. */
+            constexpr inline auto enemy_kill{ "res://assets/audio/sfx/retro/explosion2.ogg" };
+            /** Kenney retro pack — player hurt. */
+            constexpr inline auto player_hurt{ "res://assets/audio/sfx/retro/hurt2.ogg" };
+        }
+
+        namespace vfx
+        {
+            /** Simple explosion sheet frames (00–08). */
+            constexpr inline auto kill_explosion_dir{
+                "res://assets/art/explosions/simple/simpleexplosion" };
         }
     }
 }

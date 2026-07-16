@@ -24,6 +24,7 @@
 #include "entity/character/character.hpp"
 #include "entity/controller/character_controller.hpp"
 #include "util/bind.hpp"
+#include "util/combat_feedback.hpp"
 #include "util/engine.hpp"
 #include "util/input.hpp"
 #include "util/io.hpp"
@@ -165,9 +166,12 @@ namespace rl
 
         emit_hearts_changed();
 
-        // Day1：只有玩家受击震屏；打敌人只闪不震动  add by xp 20260716
+        // Day1：只有玩家受击震屏；打敌人只闪不震。
         if (owns_active_camera() && m_camera != nullptr)
+        {
             m_camera->add_trauma(combat::hit_shake_trauma);
+            combat_feedback::play_player_hurt(this->get_parent(), this->get_global_position());
+        }
 
         if (m_health.is_alive())
         {

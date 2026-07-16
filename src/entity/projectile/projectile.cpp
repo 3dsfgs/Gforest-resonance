@@ -8,6 +8,7 @@
 #include "entity/projectile/projectile.hpp"
 #include "singletons/console.hpp"
 #include "util/bind.hpp"
+#include "util/combat_feedback.hpp"
 #include "util/conversions.hpp"
 #include "util/engine.hpp"
 #include "util/io.hpp"
@@ -39,6 +40,8 @@ namespace rl
         {
             if (enemy->take_damage(combat::projectile_damage_hearts))
             {
+                combat_feedback::play_enemy_hit(this->get_parent(),
+                                                enemy->get_global_position());
                 console::get()->print("{} {} ({}/{})", io::yellow("pulse hit"),
                                       io::green(to<std::string>(enemy->get_name())),
                                       io::orange(enemy->get_hearts()),

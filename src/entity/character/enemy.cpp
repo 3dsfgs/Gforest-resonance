@@ -3,6 +3,7 @@
 #include "entity/character/enemy.hpp"
 #include "singletons/console.hpp"
 #include "util/bind.hpp"
+#include "util/combat_feedback.hpp"
 #include "util/conversions.hpp"
 #include "util/io.hpp"
 #include "util/scene.hpp"
@@ -30,6 +31,12 @@ namespace rl
     {
         console::get()->print("{} {}", io::red("enemy defeated"),
                               io::green(to<std::string>(this->get_name())));
+
+        godot::Node* parent{ this->get_parent() };
+        const godot::Vector2 death_pos{ this->get_global_position() };
+        combat_feedback::spawn_kill_explosion(parent, death_pos);
+        combat_feedback::play_enemy_kill(parent, death_pos);
+
         this->queue_free();
     }
 
