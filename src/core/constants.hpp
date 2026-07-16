@@ -96,10 +96,10 @@ namespace rl::inline constants
 
     namespace combat
     {
-        /** Invincibility duration after taking damage (P0-B02). */
-        constexpr inline double invincibility_duration{ 0.75 };
-        constexpr inline double invincibility_blink_interval{ 0.08 };
-        constexpr inline float invincibility_blink_alpha{ 0.35f };
+        /** Invincibility duration after taking damage (P0-B02 / Day1 手感修订). */
+        constexpr inline double invincibility_duration{ 1.0 };
+        constexpr inline double invincibility_blink_interval{ 0.1 };
+        constexpr inline float invincibility_blink_alpha{ 0.25f };
 
         /** Hearts removed per pulse projectile hit (P0-B03). */
         constexpr inline int projectile_damage_hearts{ 1 };
@@ -112,6 +112,22 @@ namespace rl::inline constants
         /** Ricochet self-damage radius from bounce point (pixels). */
         constexpr inline float ricochet_self_damage_radius{ 120.0f };
         constexpr inline int ricochet_self_damage_hearts{ 1 };
+
+        /** Day1 打击感：命中闪色时长（玩家/敌人共用时长，颜色分开）。 */
+        constexpr inline double hit_flash_duration{ 0.12 };
+        /** 敌人被打：青白闪（打击确认，不震屏）。 */
+        constexpr inline float enemy_hit_flash_r{ 4.0f };
+        constexpr inline float enemy_hit_flash_g{ 5.0f };
+        constexpr inline float enemy_hit_flash_b{ 5.5f };
+        /** 玩家被打：红橙闪（危险警告）。 */
+        constexpr inline float player_hit_flash_r{ 5.0f };
+        constexpr inline float player_hit_flash_g{ 1.4f };
+        constexpr inline float player_hit_flash_b{ 1.1f };
+
+        /** Day1 打击感：仅玩家受击触发屏震（trauma 累加、平方衰减）。 */
+        constexpr inline float hit_shake_trauma{ 0.7f };
+        constexpr inline float camera_shake_max_offset{ 22.0f };
+        constexpr inline float camera_shake_decay{ 2.0f };
     }
 
     namespace event

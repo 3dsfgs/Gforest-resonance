@@ -12,9 +12,17 @@ namespace rl
         Camera();
         ~Camera() = default;
 
+        void _process(double delta_time) override;
+
+        /** Add screen-shake "trauma" (0..1). Shake magnitude scales with trauma^2. */
+        void add_trauma(float amount);
+
     protected:
         static void _bind_methods()
         {
         }
+
+    private:
+        float m_trauma{ 0.0f };
     };
 }

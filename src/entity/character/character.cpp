@@ -39,7 +39,9 @@ namespace rl
     void Character::_ready()
     {
         this->add_child(m_camera);
-        m_camera->make_current();
+        // Only the player activates the camera; otherwise the last-spawned enemy steals it.
+        if (owns_active_camera())
+            m_camera->make_current();
         this->set_process(false);
 
         m_firing_point = gdcast<godot::Marker2D>(
@@ -163,8 +165,16 @@ namespace rl
 
         emit_hearts_changed();
 
-        if (m_health.is_alive() && !bypass_invincibility)
-            start_invincibility();
+        // Day1：只有玩家受击震屏；打敌人只闪不震动  add by xp 20260716
+        if (owns_active_camera() && m_camera != nullptr)
+            m_camera->add_trauma(combat::hit_shake_trauma);
+
+        if (m_health.is_alive())
+        {
+            start_hit_flash();
+            if (!bypass_invincibility)
+                start_invincibility();
+        }
 
         if (!m_health.is_alive())
         {
@@ -173,6 +183,12 @@ namespace rl
         }
 
         return true;
+    }
+
+    godot::Color Character::hit_flash_color() const
+    {
+        return godot::Color(combat::enemy_hit_flash_r, combat::enemy_hit_flash_g,
+                            combat::enemy_hit_flash_b, 1.0f);
     }
 
     void Character::reset_hearts()
@@ -193,23 +209,25 @@ namespace rl
 
     void Character::_process(const double delta_time)
     {
-        if (!is_invincible())
+        if (m_hit_flash_remaining > 0.0)
+            m_hit_flash_remaining -= delta_time;
+
+        if (is_invincible())
         {
-            end_invincibility();
-            return;
+            m_invincibility_remaining -= delta_time;
+
+            m_blink_timer += delta_time;
+            if (m_blink_timer >= combat::invincibility_blink_interval)
+            {
+                m_blink_timer -= combat::invincibility_blink_interval;
+                m_blink_visible = !m_blink_visible;
+            }
         }
 
-        m_invincibility_remaining -= delta_time;
+        update_damage_visual();
 
-        m_blink_timer += delta_time;
-        if (m_blink_timer >= combat::invincibility_blink_interval)
-        {
-            m_blink_timer -= combat::invincibility_blink_interval;
-            m_blink_visible = !m_blink_visible;
-            update_invincibility_visual();
-        }
-
-        if (!is_invincible())
+        // Stop processing once both the flash and invincibility have fully settled.
+        if (m_hit_flash_remaining <= 0.0 && !is_invincible())
             end_invincibility();
     }
 
@@ -219,7 +237,7 @@ namespace rl
         m_blink_timer = 0.0;
         m_blink_visible = true;
         this->set_process(true);
-        update_invincibility_visual();
+        update_damage_visual();
     }
 
     void Character::end_invincibility()
@@ -227,14 +245,28 @@ namespace rl
         m_invincibility_remaining = 0.0;
         m_blink_timer = 0.0;
         m_blink_visible = true;
+        m_hit_flash_remaining = 0.0;
         this->set_process(false);
-        update_invincibility_visual();
+        update_damage_visual();
     }
 
-    void Character::update_invincibility_visual()
+    void Character::start_hit_flash()
+    {
+        m_hit_flash_remaining = combat::hit_flash_duration;
+        this->set_process(true);
+        update_damage_visual();
+    }
+
+    void Character::update_damage_visual()
     {
         if (m_sprite == nullptr)
             return;
+
+        if (m_hit_flash_remaining > 0.0)
+        {
+            m_sprite->set_modulate(hit_flash_color());
+            return;
+        }
 
         const float alpha = is_invincible() && !m_blink_visible ? combat::invincibility_blink_alpha
                                                                 : 1.0f;

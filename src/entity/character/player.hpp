@@ -21,6 +21,12 @@ namespace rl
         void _ready() override;
 
     protected:
+        bool owns_active_camera() const override
+        {
+            return true;
+        }
+        godot::Color hit_flash_color() const override;
+
         void process_slide_collisions() override;
 
         static void _bind_methods();

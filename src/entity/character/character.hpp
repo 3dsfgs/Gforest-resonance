@@ -3,6 +3,7 @@
 #include <concepts>
 
 #include <godot_cpp/classes/character_body2d.hpp>
+#include <godot_cpp/variant/color.hpp>
 
 #include "core/attributes.hpp"
 #include "core/constants.hpp"
@@ -50,10 +51,18 @@ namespace rl
 
     protected:
         virtual void process_slide_collisions();
+        /** Only Player owns the active camera; enemies must not steal current. */
+        virtual bool owns_active_camera() const
+        {
+            return false;
+        }
+        /** Player: red-orange danger flash; default/enemy: cyan-white hit confirm. */
+        virtual godot::Color hit_flash_color() const;
         void emit_hearts_changed();
         void start_invincibility();
         void end_invincibility();
-        void update_invincibility_visual();
+        void start_hit_flash();
+        void update_damage_visual();
         [[property]] double get_movement_speed() const;
         [[property]] double get_movement_friction() const;
         [[property]] double get_rotation_speed() const;
@@ -114,5 +123,6 @@ namespace rl
         double m_invincibility_remaining{ 0.0 };
         double m_blink_timer{ 0.0 };
         bool m_blink_visible{ true };
+        double m_hit_flash_remaining{ 0.0 };
     };
 }

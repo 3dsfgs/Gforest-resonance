@@ -1,5 +1,6 @@
 #include <godot_cpp/classes/kinematic_collision2d.hpp>
 #include <godot_cpp/classes/ref.hpp>
+#include <godot_cpp/variant/color.hpp>
 
 #include "core/constants.hpp"
 #include "entity/character/character.hpp"
@@ -23,6 +24,12 @@ namespace rl
     {
         Character::_ready();
         emit_hearts_changed();
+    }
+
+    godot::Color Player::hit_flash_color() const
+    {
+        return godot::Color(combat::player_hit_flash_r, combat::player_hit_flash_g,
+                            combat::player_hit_flash_b, 1.0f);
     }
 
     void Player::process_slide_collisions()
