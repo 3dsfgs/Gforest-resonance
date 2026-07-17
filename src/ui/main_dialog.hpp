@@ -24,6 +24,7 @@ namespace rl::inline ui
         void _notification(int notification);
 
         void connect_to_level();
+        void bind_level(Level* level);
 
         static void _bind_methods()
         {
@@ -41,6 +42,8 @@ namespace rl::inline ui
         void finish_narrative();
 
     private:
+        Level* find_level_in_tree();
+
         Level* m_level{ nullptr };
         godot::RichTextLabel* m_console_label{ nullptr };
 

@@ -1,23 +1,29 @@
-[gd_scene load_steps=6 format=3 uid="uid://c8tur70b73kih"]
+[gd_scene format=3 uid="uid://c8tur70b73kih"]
 
-[ext_resource type="Texture2D" path="res://assets/art/prototype_textures/light/texture_03.png" id="1_nl15v"]
-[ext_resource type="Texture2D" path="res://assets/art/prototype_textures/dark/texture_04.png" id="2_6qqh6"]
-[ext_resource type="Texture2D" path="res://assets/art/prototype_textures/red/texture_02.png" id="3_blm5m"]
-[ext_resource type="Texture2D" path="res://assets/art/prototype_textures/green/texture_10.png" id="4_ix12c"]
-[ext_resource type="Texture2D" path="res://assets/art/prototype_textures/purple/texture_02.png" id="5_pmdlb"]
+[ext_resource type="Texture2D" uid="uid://bpf6bi2rgcg6f" path="res://assets/art/prototype_textures/light/texture_03.png" id="1_nl15v"]
+[ext_resource type="Texture2D" uid="uid://f53cq3a3fclc" path="res://assets/art/prototype_textures/dark/texture_04.png" id="2_6qqh6"]
+[ext_resource type="Texture2D" uid="uid://bqvttsmny3jhe" path="res://assets/art/prototype_textures/red/texture_02.png" id="3_blm5m"]
+[ext_resource type="Texture2D" uid="uid://cgqd6qp3544xx" path="res://assets/art/prototype_textures/green/texture_10.png" id="4_ix12c"]
+[ext_resource type="Texture2D" uid="uid://d4hq6ws7sk0g4" path="res://assets/art/prototype_textures/purple/texture_02.png" id="5_pmdlb"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_h"]
+size = Vector2(3200, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_v"]
+size = Vector2(40, 3090)
 
 [sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_d0buj"]
 resource_local_to_scene = true
 polygon = PackedVector2Array(512, -512, -512, -512, -512, 512, 512, 512)
 
-[node name="Level1" type="Level"]
+[node name="Level1" type="Level" unique_id=1150245615]
 
-[node name="BackgroundTexture" type="Sprite2D" parent="."]
+[node name="BackgroundTexture" type="Sprite2D" parent="." unique_id=1485838909]
 show_behind_parent = true
 scale = Vector2(4, 4)
 texture = ExtResource("1_nl15v")
 
-[node name="DirectionalLight2D" type="DirectionalLight2D" parent="."]
+[node name="DirectionalLight2D" type="DirectionalLight2D" parent="." unique_id=1262624607]
 color = Color(1, 0.94902, 0.960784, 1)
 energy = 0.75
 blend_mode = 1
@@ -26,77 +32,105 @@ range_z_max = 100
 range_layer_max = 1
 max_distance = 1000.0
 
-[node name="Wall" type="StaticBody2D" parent="."]
-z_index = 10
-position = Vector2(400, 400)
-scale = Vector2(0.25, 0.25)
+[node name="Boundaries" type="Node2D" parent="." unique_id=1023514266]
+
+[node name="BoundaryTop" type="StaticBody2D" parent="Boundaries" unique_id=1108415367]
+position = Vector2(0, -1554)
 collision_layer = 8
-collision_mask = 7
-
-[node name="WallCollisionPoly" type="CollisionPolygon2D" parent="Wall"]
-polygon = PackedVector2Array(512, 512, -512, 512, -512, -512, 512, -512)
-
-[node name="WallTexture" type="Sprite2D" parent="Wall"]
-texture = ExtResource("2_6qqh6")
-
-[node name="LightOccluder2D" type="LightOccluder2D" parent="Wall"]
-occluder = SubResource("OccluderPolygon2D_d0buj")
-
-[node name="DeathPit" type="StaticBody2D" parent="."]
-modulate = Color(0.207843, 0.0235294, 0, 1)
-self_modulate = Color(0.0313726, 0.113725, 1, 1)
-position = Vector2(-400, -400)
-scale = Vector2(0.25, 0.25)
-collision_layer = 32
 collision_mask = 0
 
-[node name="DeathCollisionPoly" type="CollisionPolygon2D" parent="DeathPit"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Boundaries/BoundaryTop" unique_id=1330774482]
+shape = SubResource("RectangleShape2D_h")
+
+[node name="BoundaryBottom" type="StaticBody2D" parent="Boundaries" unique_id=287708146]
+position = Vector2(7, 1606)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Boundaries/BoundaryBottom" unique_id=2025130774]
+shape = SubResource("RectangleShape2D_h")
+
+[node name="BoundaryLeft" type="StaticBody2D" parent="Boundaries" unique_id=1783457034]
+position = Vector2(-1606, 11)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Boundaries/BoundaryLeft" unique_id=1815937117]
+shape = SubResource("RectangleShape2D_v")
+
+[node name="BoundaryRight" type="StaticBody2D" parent="Boundaries" unique_id=1839887005]
+position = Vector2(1596, 10)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Boundaries/BoundaryRight" unique_id=57114426]
+shape = SubResource("RectangleShape2D_v")
+
+[node name="Wall" type="StaticBody2D" parent="." unique_id=2080477916]
+z_index = 10
+position = Vector2(450, 350)
+scale = Vector2(0.25, 0.25)
+collision_layer = 8
+collision_mask = 0
+
+[node name="WallCollisionPoly" type="CollisionPolygon2D" parent="Wall" unique_id=950813796]
 polygon = PackedVector2Array(512, 512, -512, 512, -512, -512, 512, -512)
 
-[node name="DeathPitTexture" type="Sprite2D" parent="DeathPit"]
+[node name="WallTexture" type="Sprite2D" parent="Wall" unique_id=1895685495]
+texture = ExtResource("2_6qqh6")
+
+[node name="LightOccluder2D" type="LightOccluder2D" parent="Wall" unique_id=1559431642]
+occluder = SubResource("OccluderPolygon2D_d0buj")
+
+[node name="DeathPit" type="Area2D" parent="." unique_id=721675386]
+modulate = Color(0.207843, 0.0235294, 0, 1)
+self_modulate = Color(0.0313726, 0.113725, 1, 1)
+position = Vector2(-450, -350)
+scale = Vector2(0.25, 0.25)
+collision_layer = 32
+monitorable = false
+
+[node name="DeathCollisionPoly" type="CollisionPolygon2D" parent="DeathPit" unique_id=497533871]
+polygon = PackedVector2Array(512, 512, -512, 512, -512, -512, 512, -512)
+
+[node name="DeathPitTexture" type="Sprite2D" parent="DeathPit" unique_id=1381885745]
 show_behind_parent = true
 texture = ExtResource("3_blm5m")
 
-[node name="LightOccluder2D" type="LightOccluder2D" parent="DeathPit"]
-show_behind_parent = true
-light_mask = 2
-occluder = SubResource("OccluderPolygon2D_d0buj")
-occluder_light_mask = 0
-
-[node name="DamageZone" type="StaticBody2D" parent="."]
-position = Vector2(-400, 400)
+[node name="DamageZone" type="Area2D" parent="." unique_id=1276451887]
+position = Vector2(-450, 350)
 scale = Vector2(0.25, 0.25)
 collision_layer = 16
-collision_mask = 0
+monitorable = false
 
-[node name="DamageCollisionPoly" type="CollisionPolygon2D" parent="DamageZone"]
+[node name="DamageCollisionPoly" type="CollisionPolygon2D" parent="DamageZone" unique_id=1711925793]
 polygon = PackedVector2Array(512, 512, -512, 512, -512, -512, 512, -512)
 
-[node name="DamageTexture" type="Sprite2D" parent="DamageZone"]
+[node name="DamageTexture" type="Sprite2D" parent="DamageZone" unique_id=831247701]
 texture = ExtResource("4_ix12c")
 
-[node name="PhysicsBox" type="RigidBody2D" parent="."]
+[node name="PhysicsBox" type="RigidBody2D" parent="." unique_id=431569369]
 z_index = 10
-position = Vector2(400, -400)
+position = Vector2(450, -350)
 collision_layer = 64
 collision_mask = 79
 contact_monitor = true
 linear_damp = 1.0
 
-[node name="PhysicsBoxCollisionPoly" type="CollisionPolygon2D" parent="PhysicsBox"]
+[node name="PhysicsBoxCollisionPoly" type="CollisionPolygon2D" parent="PhysicsBox" unique_id=1243128672]
 scale = Vector2(0.25, 0.25)
 polygon = PackedVector2Array(512, 512, -512, 512, -512, -512, 512, -512)
 
-[node name="PhysicsBoxTexture" type="Sprite2D" parent="PhysicsBox"]
+[node name="PhysicsBoxTexture" type="Sprite2D" parent="PhysicsBox" unique_id=1671564731]
 scale = Vector2(0.25, 0.25)
 texture = ExtResource("5_pmdlb")
 
-[node name="LightOccluder2D" type="LightOccluder2D" parent="PhysicsBox"]
+[node name="LightOccluder2D" type="LightOccluder2D" parent="PhysicsBox" unique_id=1700789280]
 z_index = -1
 scale = Vector2(0.25, 0.25)
 occluder = SubResource("OccluderPolygon2D_d0buj")
 
-[node name="SpawnPoint" type="Marker2D" parent="."]
+[node name="SpawnPoint" type="Marker2D" parent="." unique_id=967565699]
 
-[node name="EnemySpawn1" type="Marker2D" parent="."]
-position = Vector2(0, 200)
+[node name="EnemySpawn1" type="Marker2D" parent="." unique_id=2047486174]
+position = Vector2(0, 220)

@@ -44,6 +44,10 @@ namespace rl
         bool active() const;
 
         [[nodiscard]] LevelState get_state() const;
+        void set_room_index(int room_index);
+        [[nodiscard]] int get_room_index() const;
+        [[nodiscard]] int get_player_hearts() const;
+        void apply_player_hearts(int hearts);
 
     protected:
         static void _bind_methods();
@@ -68,6 +72,7 @@ namespace rl
         std::atomic<bool> m_active{ false };
         LevelState m_state{ LevelState::Playing };
         int m_enemy_count{ 0 };
+        int m_room_index{ 0 };
         godot::Node* m_background{ nullptr };
         ProjectileSpawner* m_projectile_spawner{ memnew(rl::ProjectileSpawner) };
         Player* m_player{ nullptr };

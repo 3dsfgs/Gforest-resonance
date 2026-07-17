@@ -38,6 +38,10 @@ namespace rl::inline utils
         TStr m_str{};
     };
 
+    /**
+     * Required cast: input and result must be non-null (debug asserts).
+     * Use for nodes that must exist (viewport, player controller, etc.).
+     */
     template <typename TOut, typename TIn>
         requires std::derived_from<std::remove_cvref_t<TIn>, godot::Object>
     constexpr inline TOut* gdcast(TIn* obj)
@@ -46,6 +50,19 @@ namespace rl::inline utils
         auto ret{ godot::Object::cast_to<TOut>(obj) };
         runtime_assert(ret != nullptr);
         return ret;
+    }
+
+    /**
+     * Optional cast: null input / failed cast → nullptr, no assert.
+     * Use for find_child results that may be missing (PhysicsBox, SpawnPoint, etc.).
+     */
+    template <typename TOut, typename TIn>
+        requires std::derived_from<std::remove_cvref_t<TIn>, godot::Object>
+    constexpr inline TOut* try_gdcast(TIn* obj)
+    {
+        if (obj == nullptr)
+            return nullptr;
+        return godot::Object::cast_to<TOut>(obj);
     }
 
     template <typename TOut>

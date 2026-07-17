@@ -20,6 +20,7 @@ namespace rl::inline ui
         void _draw() override;
 
         void connect_to_player();
+        void disconnect_from_player();
         void update_hearts(int current, int max_hearts);
 
     protected:
@@ -29,6 +30,7 @@ namespace rl::inline ui
         static void _bind_methods()
         {
             bind_member_function(HeartHud, connect_to_player);
+            bind_member_function(HeartHud, disconnect_from_player);
             bind_member_function(HeartHud, on_player_hearts_changed);
             bind_member_function(HeartHud, on_player_died);
             bind_member_function(HeartHud, update_hearts);

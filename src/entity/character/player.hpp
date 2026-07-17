@@ -2,7 +2,7 @@
 
 #include <unordered_set>
 
-#include <godot_cpp/classes/physics_body2d.hpp>
+#include <godot_cpp/classes/area2d.hpp>
 
 #include "core/constants.hpp"
 #include "entity/character/character.hpp"
@@ -32,8 +32,9 @@ namespace rl
         static void _bind_methods();
 
     private:
-        void handle_zone_contact(godot::PhysicsBody2D* body);
+        void process_area_traps();
+        void handle_zone_area(godot::Area2D* area);
 
-        std::unordered_set<uint64_t> m_active_zone_colliders{};
+        std::unordered_set<uint64_t> m_active_zone_areas{};
     };
 }

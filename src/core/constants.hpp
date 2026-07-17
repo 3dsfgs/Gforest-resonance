@@ -9,12 +9,16 @@ namespace rl::inline constants
     {
         namespace level
         {
-            constexpr inline auto level1{ "Level1" };
-            constexpr inline auto physics_box{ "PhysicsBox" };
-            constexpr inline auto spawn_point{ "SpawnPoint" };
-            constexpr inline auto enemy_spawn_prefix{ "EnemySpawn" };
-            constexpr inline auto enemy_spawn1{ "EnemySpawn1" };
-            constexpr inline auto boundaries{ "Boundaries" };
+        constexpr inline auto level1{ "Level1" };
+        constexpr inline auto level2{ "Level2" };
+        constexpr inline auto level3{ "Level3" };
+        constexpr inline auto physics_box{ "PhysicsBox" };
+        constexpr inline auto spawn_point{ "SpawnPoint" };
+        constexpr inline auto enemy_spawn_prefix{ "EnemySpawn" };
+        constexpr inline auto enemy_spawn1{ "EnemySpawn1" };
+        constexpr inline auto damage_zone{ "DamageZone" };
+        constexpr inline auto death_pit{ "DeathPit" };
+        constexpr inline auto boundaries{ "Boundaries" };
             constexpr inline auto ground{ "Ground" };
             constexpr inline auto debug_zones{ "DebugZones" };
             constexpr inline auto ground_sprite{ "GroundSprite" };
@@ -71,6 +75,9 @@ namespace rl::inline constants
         constexpr inline float near_overlay_alpha{ 0.72f };
         constexpr inline float door_opening_width{ 220.0f };
         constexpr inline float wall_visual_depth{ 72.0f };
+
+        /** Day4–5：三房顺序；最后一房清怪才 Victory。 */
+        constexpr inline int room_count{ 3 };
     }
 
     namespace narrative
@@ -171,6 +178,8 @@ namespace rl::inline constants
         constexpr inline auto character_rotate{ "character_rotate" };
         constexpr inline auto character_shoot{ "character_shoot" };
         constexpr inline auto level_state_changed{ "level_state_changed" };
+        constexpr inline auto room_cleared{ "room_cleared" };
+        constexpr inline auto run_restart{ "run_restart" };
         constexpr inline auto body_entered{ "body_entered" };
         constexpr inline auto body_exited{ "body_exited" };
         constexpr inline auto signal_example{ "custom_signal_example" };
@@ -201,14 +210,15 @@ namespace rl::inline constants
      *
      * | Entity       | layer (LayerID)   | mask includes                          | scene value |
      * |--------------|-------------------|----------------------------------------|-------------|
-     * | Player       | Player            | Walls, DamageZones, DeathZones, NPCs   | mask 58     |
+     * | Player       | Player            | Walls, NPCs                           | mask 10     |
      * | Enemy        | NPCs              | Walls, Player                          | mask 9      |
      * | Projectile   | Projectiles       | Walls, NPCs                            | mask 10     |
      * | Projectile*  | Projectiles       | + PhysicsObjects (B03 ricochet debug)  | mask 74     |
      * | Walls        | Walls             | —                                      | mask 0      |
-     * | DamageZones  | DamageZones       | —                                      | mask 0      |
-     * | DeathZones   | DeathZones        | —                                      | mask 0      |
+     * | DamageZones  | DamageZones       | Player (Area2D trap)                   | mask 1      |
+     * | DeathZones   | DeathZones        | Player (Area2D trap)                   | mask 1      |
      *
+     * Day4–5: Damage/Death are Area2D traps (passable). Player no longer solid-collides them.
      * *After wall/box ricochet, Projectile runtime-adds Player to mask for self-damage.
      */
     namespace collision
@@ -218,9 +228,9 @@ namespace rl::inline constants
         constexpr inline uint32_t projectile_layer{ static_cast<uint32_t>(LayerID::Projectiles) };
         constexpr inline uint32_t walls_layer{ static_cast<uint32_t>(LayerID::Walls) };
 
-        constexpr inline uint32_t player_mask{
-            static_cast<uint32_t>(LayerID::Walls) | static_cast<uint32_t>(LayerID::DamageZones) |
-            static_cast<uint32_t>(LayerID::DeathZones) | static_cast<uint32_t>(LayerID::NPCs) };
+        /** Solid collisions only — traps are Area2D, detected separately. */
+        constexpr inline uint32_t player_mask{ static_cast<uint32_t>(LayerID::Walls) |
+                                               static_cast<uint32_t>(LayerID::NPCs) };
         constexpr inline uint32_t enemy_mask{ static_cast<uint32_t>(LayerID::Walls) |
                                               static_cast<uint32_t>(LayerID::Player) };
         constexpr inline uint32_t projectile_mask{ static_cast<uint32_t>(LayerID::Walls) |
@@ -228,6 +238,8 @@ namespace rl::inline constants
         /** B03 ricochet off DebugZones/PhysicsBox — used in bullet.tscn. */
         constexpr inline uint32_t projectile_mask_ricochet{
             projectile_mask | static_cast<uint32_t>(LayerID::PhysicsObjects) };
+        /** Area2D trap mask: detect Player body. */
+        constexpr inline uint32_t trap_mask{ static_cast<uint32_t>(LayerID::Player) };
     }
 
     namespace path
@@ -235,11 +247,19 @@ namespace rl::inline constants
     {
         namespace scene
         {
-            /** Room Template v0 — forest clearing; runtime root 仍为 Level1。 */
+            /** Day4–5 三房序列。 */
             constexpr inline auto Level1{ "res://scenes/levels/level1.tscn" };
+            constexpr inline auto Level2{ "res://scenes/levels/level2.tscn" };
+            constexpr inline auto Level3{ "res://scenes/levels/level3.tscn" };
             constexpr inline auto Player{ "res://scenes/characters/player.tscn" };
             constexpr inline auto Bullet{ "res://scenes/projectiles/bullet.tscn" };
             constexpr inline auto Enemy{ "res://scenes/characters/enemy.tscn" };
+
+            constexpr inline const char* room_paths[level::room_count]{
+                Level1,
+                Level2,
+                Level3,
+            };
         }
 
         namespace room_assets

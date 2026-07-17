@@ -48,6 +48,7 @@ namespace rl
         [[nodiscard]] int get_max_hearts() const;
         bool take_damage(int hearts = 1, bool bypass_invincibility = false);
         void reset_hearts();
+        void apply_hearts(int hearts);
 
     protected:
         virtual void process_slide_collisions();

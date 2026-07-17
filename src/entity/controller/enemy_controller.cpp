@@ -25,7 +25,7 @@ namespace rl
         if (level == nullptr)
             return nullptr;
 
-        return gdcast<Player>(level->find_child(name::character::player, true, false));
+        return try_gdcast<Player>(level->find_child(name::character::player, true, false));
     }
 
     void EnemyController::process_action_input(godot::Input* const input, double delta_time)

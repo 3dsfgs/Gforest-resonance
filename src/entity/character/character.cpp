@@ -45,10 +45,10 @@ namespace rl
             m_camera->make_current();
         this->set_process(false);
 
-        m_firing_point = gdcast<godot::Marker2D>(
+        m_firing_point = try_gdcast<godot::Marker2D>(
             this->find_child(name::character::firing_pt, true, false));
 
-        m_sprite = gdcast<godot::Sprite2D>(
+        m_sprite = try_gdcast<godot::Sprite2D>(
             this->find_child(name::character::sprite, true, false));
 
         runtime_assert(m_firing_point != nullptr);
@@ -200,6 +200,11 @@ namespace rl
         end_invincibility();
         m_health.reset();
         emit_hearts_changed();
+    }
+
+    void Character::apply_hearts(const int hearts)
+    {
+        this->set_hearts(hearts);
     }
 
     void Character::emit_hearts_changed()

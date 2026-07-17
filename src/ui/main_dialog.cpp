@@ -42,29 +42,48 @@ namespace rl::inline ui
 
         godot::Node* root{ scene::tree::root_node(this) };
         godot::Node* label{ root->find_child(name::dialog::console, true, false) };
-        godot::Node* level{ this->find_child(name::level::level1, true, false) };
 
-        m_level = gdcast<Level>(level);
-        m_console_label = gdcast<godot::RichTextLabel>(label);
+        m_level = this->find_level_in_tree();
+        m_console_label = try_gdcast<godot::RichTextLabel>(label);
 
         game_console->set_context(m_console_label);
 
         this->call_deferred("connect_to_level");
     }
 
+    Level* MainDialog::find_level_in_tree()
+    {
+        godot::Node* viewport_node{
+            this->find_child(name::dialog::game_sub_viewport, true, false) };
+        if (viewport_node == nullptr)
+            return nullptr;
+
+        const int child_count{ viewport_node->get_child_count() };
+        for (int i = 0; i < child_count; ++i)
+        {
+            if (Level* level{ godot::Object::cast_to<Level>(viewport_node->get_child(i)) })
+                return level;
+        }
+        return nullptr;
+    }
+
+    void MainDialog::bind_level(Level* level)
+    {
+        m_level = level;
+        this->connect_to_level();
+    }
+
     void MainDialog::connect_to_level()
     {
         if (m_level == nullptr)
-        {
-            godot::Node* level{ this->find_child(name::level::level1, true, false) };
-            m_level = gdcast<Level>(level);
-        }
+            m_level = this->find_level_in_tree();
 
         if (m_level == nullptr)
             return;
 
         signal<event::level_state_changed>::connect<Level>(m_level) <=>
             signal_callback(this, on_level_state_changed);
+        this->stop_narrative();
     }
 
     void MainDialog::_process(double delta_time)

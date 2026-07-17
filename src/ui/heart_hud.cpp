@@ -1,9 +1,11 @@
+#include <godot_cpp/variant/callable.hpp>
 #include <godot_cpp/variant/color.hpp>
 #include <godot_cpp/variant/vector2.hpp>
 
 #include "core/assert.hpp"
 #include "core/constants.hpp"
 #include "entity/character/player.hpp"
+#include "entity/level.hpp"
 #include "singletons/console.hpp"
 #include "ui/heart_hud.hpp"
 #include "util/bind.hpp"
@@ -30,19 +32,56 @@ namespace rl::inline ui
         this->call_deferred("connect_to_player");
     }
 
-    void HeartHud::connect_to_player()
+    void HeartHud::disconnect_from_player()
     {
-        if (m_player != nullptr)
+        if (m_player == nullptr)
             return;
 
-        godot::Node* const viewport{ this->get_parent()->get_parent() };
-        runtime_assert(viewport != nullptr);
+        const godot::Callable hearts_cb{ this, "on_player_hearts_changed" };
+        const godot::Callable died_cb{ this, "on_player_died" };
 
-        godot::Node* level{ viewport->find_child(name::level::level1, true, false) };
-        runtime_assert(level != nullptr);
+        if (m_player->is_connected(event::hearts_changed, hearts_cb))
+            m_player->disconnect(event::hearts_changed, hearts_cb);
 
-        m_player = gdcast<Player>(level->find_child(name::character::player, true, false));
-        runtime_assert(m_player != nullptr);
+        if (m_player->is_connected(event::died, died_cb))
+            m_player->disconnect(event::died, died_cb);
+
+        m_player = nullptr;
+    }
+
+    void HeartHud::connect_to_player()
+    {
+        godot::Node* const viewport{ this->get_parent() != nullptr ? this->get_parent()->get_parent()
+                                                                   : nullptr };
+        if (viewport == nullptr)
+            return;
+
+        Level* level{ nullptr };
+        const int child_count{ viewport->get_child_count() };
+        for (int i = 0; i < child_count; ++i)
+        {
+            level = godot::Object::cast_to<Level>(viewport->get_child(i));
+            if (level != nullptr)
+                break;
+        }
+
+        if (level == nullptr)
+            return;
+
+        Player* player{ godot::Object::cast_to<Player>(
+            level->find_child(name::character::player, true, false)) };
+        if (player == nullptr)
+        {
+            // Level::_ready may not have spawned the player yet.
+            this->call_deferred("connect_to_player");
+            return;
+        }
+
+        if (m_player == player)
+            return;
+
+        this->disconnect_from_player();
+        m_player = player;
 
         update_hearts(m_player->get_hearts(), m_player->get_max_hearts());
 
@@ -85,6 +124,6 @@ namespace rl::inline ui
     void HeartHud::on_player_died()
     {
         console::get()->print("{} {}", io::red("player"), io::yellow("died"));
-        update_hearts(0, m_player != nullptr ? m_player->get_max_hearts() : m_max_hearts);
+        update_hearts(0, m_max_hearts);
     }
 }

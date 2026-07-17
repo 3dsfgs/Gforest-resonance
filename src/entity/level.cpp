@@ -48,10 +48,34 @@ namespace rl
         this->activate(true);
     }
 
+    void Level::set_room_index(const int room_index)
+    {
+        m_room_index = room_index;
+    }
+
+    int Level::get_room_index() const
+    {
+        return m_room_index;
+    }
+
+    int Level::get_player_hearts() const
+    {
+        if (m_player == nullptr)
+            return 0;
+        return m_player->get_hearts();
+    }
+
+    void Level::apply_player_hearts(const int hearts)
+    {
+        if (m_player == nullptr)
+            return;
+        m_player->apply_hearts(hearts);
+    }
+
     void Level::_ready()
     {
         godot::Node* box{ this->find_child(name::level::physics_box, true, false) };
-        m_physics_box = gdcast<godot::RigidBody2D>(box);
+        m_physics_box = try_gdcast<godot::RigidBody2D>(box);
 
         resource::preload::packed_scene<Player> player_scene{ path::scene::Player };
         m_player = player_scene.instantiate();
@@ -87,7 +111,7 @@ namespace rl
             return;
 
         godot::Node* spawn_node{ this->find_child(name::level::spawn_point, true, false) };
-        godot::Marker2D* spawn_point{ gdcast<godot::Marker2D>(spawn_node) };
+        godot::Marker2D* spawn_point{ try_gdcast<godot::Marker2D>(spawn_node) };
         if (spawn_point != nullptr)
             m_player->set_global_position(spawn_point->get_global_position());
     }
@@ -107,7 +131,7 @@ namespace rl
             if (!child_name.begins_with(name::level::enemy_spawn_prefix))
                 continue;
 
-            godot::Marker2D* marker{ gdcast<godot::Marker2D>(child) };
+            godot::Marker2D* marker{ try_gdcast<godot::Marker2D>(child) };
             if (marker == nullptr)
                 continue;
 
@@ -131,7 +155,7 @@ namespace rl
 
         godot::Node* camera_node{
             m_player->find_child(name::level::player_camera, true, false) };
-        godot::Camera2D* camera{ gdcast<godot::Camera2D>(camera_node) };
+        godot::Camera2D* camera{ try_gdcast<godot::Camera2D>(camera_node) };
         if (camera == nullptr)
             return;
 
@@ -221,6 +245,12 @@ namespace rl
         if (!input_handler->is_action_just_pressed(input::action::restart))
             return;
 
+        if (m_state == LevelState::Victory)
+        {
+            this->emit_signal(event::run_restart);
+            return;
+        }
+
         this->reset_level();
     }
 
@@ -266,6 +296,8 @@ namespace rl
         bind_member_function(Level, on_player_died);
         bind_member_function(Level, on_enemy_died);
         signal_binding<Level, event::level_state_changed>::add<int>();
+        signal_binding<Level, event::room_cleared>::add<int>();
+        signal_binding<Level, event::run_restart>::add<>();
     }
 
     [[signal_slot]]
@@ -280,7 +312,7 @@ namespace rl
             // Add first so global transforms resolve against the level tree.
             // this->add_child(projectile);
 
-            godot::Marker2D* firing_pt{ gdcast<godot::Marker2D>(obj) };
+            godot::Marker2D* firing_pt{ try_gdcast<godot::Marker2D>(obj) };
             if (firing_pt != nullptr)
             {
                 const double spread{ combat::projectile_spread_radians };
@@ -333,7 +365,17 @@ namespace rl
         if (m_enemy_count > 0)
             --m_enemy_count;
 
-        if (m_enemy_count <= 0)
+        if (m_enemy_count > 0)
+            return;
+
+        // Last room → Victory; earlier rooms → advance via room_cleared.
+        if (m_room_index >= level::room_count - 1)
+        {
             this->transition_to_state(LevelState::Victory);
+            return;
+        }
+
+        this->set_player_input_enabled(false);
+        this->emit_signal(event::room_cleared, m_room_index);
     }
 }
