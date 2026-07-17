@@ -36,8 +36,8 @@ namespace rl
         static millisec_t calculate_spawn_delay(double fire_rate);
 
     private:
-        // number of prjectiles per second
-        double m_fire_rate{ 10.0 };
+        // number of projectiles per second
+        double m_fire_rate{ combat::projectile_fire_rate };
         // time delay between shots (ms). multiplication by 100 is just to offset rounding errors.
         millisec_t m_spawn_delay{ ProjectileSpawner::calculate_spawn_delay(m_fire_rate) };
         // the time point that keeps track of when the last projectile was spawned.

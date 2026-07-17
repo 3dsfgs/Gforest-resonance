@@ -2,9 +2,12 @@
 #include <godot_cpp/classes/collision_polygon2d.hpp>
 #include <godot_cpp/classes/marker2d.hpp>
 #include <godot_cpp/classes/rigid_body2d.hpp>
+// #include <godot_cpp/core/math.hpp>
 #include <godot_cpp/variant/callable.hpp>
+#include <godot_cpp/variant/utility_functions.hpp>
 #include <godot_cpp/variant/vector2.hpp>
 
+#include "core/constants.hpp"
 #include "entity/character/character.hpp"
 #include "entity/character/enemy.hpp"
 #include "entity/controller/enemy_controller.hpp"
@@ -274,13 +277,30 @@ namespace rl
         Projectile* projectile{ m_projectile_spawner->spawn_projectile() };
         if (projectile != nullptr)
         {
+            // Add first so global transforms resolve against the level tree.
+            // this->add_child(projectile);
+
             godot::Marker2D* firing_pt{ gdcast<godot::Marker2D>(obj) };
             if (firing_pt != nullptr)
             {
+                const double spread{ combat::projectile_spread_radians };
+                const double yaw_jitter{
+                    spread > 0.0
+                        ? godot::UtilityFunctions::randf_range(-spread, spread)
+                        : 0.0
+                };
                 projectile->set_position(firing_pt->get_global_position());
-                projectile->set_rotation(firing_pt->get_global_rotation());
+                projectile->set_rotation(firing_pt->get_global_rotation() + yaw_jitter);
+                /*const double facing{ firing_pt->get_global_rotation() + yaw_jitter };
+                const godot::Vector2 muzzle{
+                    firing_pt->get_global_position() +
+                    godot::Vector2(static_cast<real_t>(godot::Math::cos(facing)),
+                                   static_cast<real_t>(godot::Math::sin(facing))) *
+                        static_cast<real_t>(combat::projectile_muzzle_forward_offset)
+                };*/
+                // projectile->set_global_position(muzzle);
+                // projectile->set_global_rotation(facing);
             }
-
             this->add_child(projectile);
         }
     }

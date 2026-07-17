@@ -1,4 +1,5 @@
 #include <godot_cpp/classes/physics_body2d.hpp>
+#include <godot_cpp/classes/physics_direct_body_state2d.hpp>
 #include <godot_cpp/classes/physics_material.hpp>
 #include <godot_cpp/variant/vector2.hpp>
 
@@ -18,8 +19,8 @@ namespace rl
     void Projectile::_ready()
     {
         godot::Ref<godot::PhysicsMaterial> material{ memnew(godot::PhysicsMaterial) };
-        material->set_bounce(0.85);
-        material->set_friction(0.2);
+        material->set_bounce(combat::projectile_physics_bounce);
+        material->set_friction(combat::projectile_physics_friction);
         this->set_physics_material_override(material);
 
         m_start_pos = this->get_global_position();
@@ -28,6 +29,52 @@ namespace rl
 
         signal<event::body_entered>::connect<Projectile>(this) <=>
             signal_callback(this, on_body_entered);
+    }
+
+    void Projectile::sync_facing_to_velocity(const godot::Vector2& velocity)
+    {
+        if (velocity.length_squared() < 1.0)
+            return;
+
+        this->set_rotation(velocity.angle());
+    }
+
+    void Projectile::restore_speed_along_velocity(godot::PhysicsDirectBodyState2D* state)
+    {
+        if (state == nullptr)
+            return;
+
+        const godot::Vector2 velocity{ state->get_linear_velocity() };
+        if (velocity.length_squared() < 1.0 || m_flight_speed <= 0.0)
+            return;
+
+        const godot::Vector2 dir{ velocity.normalized() };
+        state->set_linear_velocity(dir * m_flight_speed);
+        this->set_rotation(dir.angle());
+    }
+
+    void Projectile::_integrate_forces(godot::PhysicsDirectBodyState2D* state)
+    {
+        if (state == nullptr || m_hit)
+            return;
+
+        const godot::Vector2 velocity{ state->get_linear_velocity() };
+
+        if (!m_flight_speed_captured && velocity.length_squared() > 1.0)
+        {
+            m_flight_speed = velocity.length();
+            m_flight_speed_captured = true;
+        }
+
+        if (m_pending_bounce_realign)
+        {
+            // Physics bounce already flipped velocity; re-apply launch speed + face new heading.
+            restore_speed_along_velocity(state);
+            m_pending_bounce_realign = false;
+            return;
+        }
+
+        sync_facing_to_velocity(velocity);
     }
 
     [[signal_slot]]
@@ -80,15 +127,21 @@ namespace rl
             const uint32_t layer{ physics_body->get_collision_layer() };
             const auto walls_mask{ static_cast<uint32_t>(LayerID::Walls) };
             const auto physics_objects_mask{ static_cast<uint32_t>(LayerID::PhysicsObjects) };
-            if ((layer & walls_mask) != 0 || (layer & physics_objects_mask) != 0)
+            if ((layer & walls_mask) == 0 && (layer & physics_objects_mask) == 0)
+                return;
+
+            if (m_wall_bounce_count >= combat::projectile_max_wall_bounces)
             {
-                if (!m_has_bounced)
-                {
-                    m_has_bounced = true;
-                    m_bounce_point = this->get_global_position();
-                    this->set_collision_mask(this->get_collision_mask() | collision::player_layer);
-                }
+                m_hit = true;
+                this->queue_free();
+                return;
             }
+
+            ++m_wall_bounce_count;
+            m_has_bounced = true;
+            m_bounce_point = this->get_global_position();
+            m_pending_bounce_realign = true;
+            this->set_collision_mask(this->get_collision_mask() | collision::player_layer);
         }
     }
 

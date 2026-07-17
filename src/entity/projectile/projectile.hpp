@@ -1,5 +1,6 @@
 #pragma once
 
+#include <godot_cpp/classes/physics_direct_body_state2d.hpp>
 #include <godot_cpp/classes/rigid_body2d.hpp>
 #include <godot_cpp/variant/vector2.hpp>
 
@@ -27,6 +28,7 @@ namespace rl
 
         void _ready() override;
         void _process(double delta_time) override;
+        void _integrate_forces(godot::PhysicsDirectBodyState2D* state) override;
 
         [[property]] double get_movement_speed() const;
         [[property]] double get_time_to_live() const;
@@ -58,20 +60,28 @@ namespace rl
 
         [[signal_slot]] void on_body_entered(godot::Node* body);
 
+        void sync_facing_to_velocity(const godot::Vector2& velocity);
+        void restore_speed_along_velocity(godot::PhysicsDirectBodyState2D* state);
+
     protected:
         godot::Vector2 m_start_pos{ 0.0, 0.0 };
         godot::Vector2 m_bounce_point{ 0.0, 0.0 };
         bool m_hit{ false };
         bool m_has_bounced{ false };
-        // projectile movement velocity (pixels)
-        double m_velocity{ 1500 };
-        // projectile movement speed (pixels/s)
+        bool m_pending_bounce_realign{ false };
+        bool m_flight_speed_captured{ false };
+        int m_wall_bounce_count{ 0 };
+        /** Captured flight speed after launch; restored after wall bounce. */
+        double m_flight_speed{ 0.0 };
+        // projectile movement velocity / impulse (pixels)
+        double m_velocity{ combat::projectile_impulse };
+        // projectile movement speed (pixels/s) — legacy property
         double m_movement_speed{ 1000.0 };
         // projectile acceleration (pixels/s/s)
         double m_acceleration{ 100.0 };
         // max time duration alive (seconds)
-        double m_time_to_live{ 2.5 };
-        // max travel distance (pixels) - uint32_t?
-        double m_max_travel_dist{ 1000.0 * 1000.0 };
+        double m_time_to_live{ combat::projectile_time_to_live };
+        // max travel distance squared (pixels^2)
+        double m_max_travel_dist{ combat::projectile_max_travel * combat::projectile_max_travel };
     };
 }

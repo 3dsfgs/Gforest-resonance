@@ -113,6 +113,24 @@ namespace rl::inline constants
         constexpr inline float ricochet_self_damage_radius{ 120.0f };
         constexpr inline int ricochet_self_damage_hearts{ 1 };
 
+        /** Day3 脉冲手感：射速 / 弹道 / 散射 / 撞墙反弹。 */
+        constexpr inline double projectile_fire_rate{ 7.0 };
+        /** apply_impulse 冲量大小（配合 bullet.tscn 小质量）。 */
+        constexpr inline double projectile_impulse{ 1500.0 };
+        constexpr inline double projectile_time_to_live{ 2.5 };
+        constexpr inline double projectile_max_travel{ 1200.0 };
+        /** 发射角随机半宽（弧度）；0 = 无散射。 */
+        constexpr inline double projectile_spread_radians{ 0.04 };
+        constexpr inline float projectile_physics_bounce{ 0.9f };
+        constexpr inline float projectile_physics_friction{ 0.05f };
+        /** 撞墙最多反弹次数；再撞墙则销毁。 */
+        constexpr inline int projectile_max_wall_bounces{ 1 };
+        /**
+         * 枪口前移（世界像素）：大贴图以中心为原点时，再沿射击方向推出一段，
+         * 避免子弹后半截嵌进枪管/身体。与 bullet.tscn 内 Sprite 偏移叠加。
+         */
+        // constexpr inline double projectile_muzzle_forward_offset{ 12.0 };
+
         /** Day1 打击感：命中闪色时长（玩家/敌人共用时长，颜色分开）。敌人的无敌帧可能后续需要修改 */
         constexpr inline double hit_flash_duration{ 0.12 };
         /** 敌人被打：青白闪（打击确认，不震屏）。 */

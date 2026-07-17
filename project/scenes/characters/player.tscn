@@ -27,7 +27,7 @@ texture = ExtResource("1_rbbbp")
 
 [node name="FiringPoint" type="Marker2D" parent="PlayerCollisionPoly"]
 unique_name_in_owner = true
-position = Vector2(23.5, 9.50009)
+position = Vector2(27, 9.5)
 
 [node name="PointLight2D" type="PointLight2D" parent="."]
 scale = Vector2(25, 25)
