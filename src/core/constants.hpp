@@ -82,6 +82,18 @@ namespace rl::inline constants
         constexpr inline int room_count{ 3 };
     }
 
+    namespace atmosphere
+    {
+        /** Day13 森林雾 / 暖绿调色。 */
+        constexpr inline float fog_density{ 0.28f };
+        constexpr inline float fog_drift_speed{ 0.05f };
+        constexpr inline float fog_scale{ 3.2f };
+        constexpr inline int fog_z_index{ 18 };
+        /** 背景向森林绿插值权重（保留各房原有 tint）。 */
+        constexpr inline float background_forest_blend{ 0.4f };
+        constexpr inline float light_energy{ 0.72f };
+    }
+
     namespace narrative
     {
         /** Seconds between revealed characters (P0-L03). */
@@ -320,6 +332,12 @@ namespace rl::inline constants
         namespace data
         {
             constexpr inline auto buff_rules{ "res://data/buff_rules.json" };
+        }
+
+        namespace shader
+        {
+            /** Day13 房内漂移雾。 */
+            constexpr inline auto forest_fog{ "res://shaders/forest_fog.gdshader" };
         }
 
         namespace art

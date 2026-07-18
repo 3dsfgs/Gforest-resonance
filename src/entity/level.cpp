@@ -1,9 +1,16 @@
 #include <godot_cpp/classes/camera2d.hpp>
 #include <godot_cpp/classes/collision_polygon2d.hpp>
+#include <godot_cpp/classes/directional_light2d.hpp>
+#include <godot_cpp/classes/image.hpp>
+#include <godot_cpp/classes/image_texture.hpp>
 #include <godot_cpp/classes/marker2d.hpp>
+#include <godot_cpp/classes/resource_loader.hpp>
 #include <godot_cpp/classes/rigid_body2d.hpp>
-// #include <godot_cpp/core/math.hpp>
+#include <godot_cpp/classes/shader.hpp>
+#include <godot_cpp/classes/shader_material.hpp>
+#include <godot_cpp/classes/sprite2d.hpp>
 #include <godot_cpp/variant/callable.hpp>
+#include <godot_cpp/variant/color.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
 #include <godot_cpp/variant/vector2.hpp>
 
@@ -89,6 +96,7 @@ namespace rl
         birth_buff::apply_from_disk(m_player, m_projectile_spawner);
         this->spawn_enemies_from_markers();
         this->apply_room_camera_limits();
+        this->apply_forest_atmosphere();
 
         signal<event::died>::connect<Player>(m_player) <=> signal_callback(this, on_player_died);
 
@@ -176,6 +184,78 @@ namespace rl
         camera->set("limit_right", static_cast<int>(level::half_playable_width));
         camera->set("limit_top", static_cast<int>(-level::half_playable_height));
         camera->set("limit_bottom", static_cast<int>(level::half_playable_height));
+    }
+
+    void Level::apply_forest_atmosphere()
+    {
+        // 1) 背景向暖绿靠拢（保留各房原 modulate 差异）
+        if (godot::Node* bg_node{ this->find_child("BackgroundTexture", true, false) })
+        {
+            if (godot::Sprite2D* bg{ godot::Object::cast_to<godot::Sprite2D>(bg_node) })
+            {
+                const godot::Color forest{ 0.72f, 0.88f, 0.70f, 1.0f };
+                bg->set_modulate(
+                    bg->get_modulate().lerp(forest, atmosphere::background_forest_blend));
+            }
+        }
+
+        // 2) 定向光偏林间暖绿
+        if (godot::Node* light_node{ this->find_child("DirectionalLight2D", true, false) })
+        {
+            if (godot::DirectionalLight2D* light{
+                    godot::Object::cast_to<godot::DirectionalLight2D>(light_node) })
+            {
+                light->set_color(godot::Color(0.90f, 0.96f, 0.82f, 1.0f));
+                light->set_energy(atmosphere::light_energy);
+            }
+        }
+
+        // 已有场景雾节点则不重复挂
+        if (this->find_child(name::level::fog_overlay, true, false) != nullptr)
+            return;
+
+        godot::ResourceLoader* loader{ godot::ResourceLoader::get_singleton() };
+        if (loader == nullptr || !loader->exists(path::shader::forest_fog))
+        {
+            console::get()->print("{} {}", io::orange("atmosphere"),
+                                  io::yellow("forest_fog.gdshader missing"));
+            return;
+        }
+
+        godot::Ref<godot::Shader> shader{ loader->load(path::shader::forest_fog) };
+        if (!shader.is_valid())
+            return;
+
+        godot::Ref<godot::Image> image{
+            godot::Image::create_empty(64, 64, false, godot::Image::FORMAT_RGBA8) };
+        if (!image.is_valid())
+            return;
+        image->fill(godot::Color(1.0f, 1.0f, 1.0f, 1.0f));
+
+        godot::Ref<godot::ImageTexture> texture{ godot::ImageTexture::create_from_image(image) };
+        if (!texture.is_valid())
+            return;
+
+        godot::Ref<godot::ShaderMaterial> material;
+        material.instantiate();
+        material->set_shader(shader);
+        material->set_shader_parameter("density", atmosphere::fog_density);
+        material->set_shader_parameter("drift_speed", atmosphere::fog_drift_speed);
+        material->set_shader_parameter("scale", atmosphere::fog_scale);
+        material->set_shader_parameter("fog_color",
+                                      godot::Color(0.58f, 0.76f, 0.58f, 1.0f));
+
+        godot::Sprite2D* fog{ memnew(godot::Sprite2D) };
+        fog->set_name(name::level::fog_overlay);
+        fog->set_texture(texture);
+        fog->set_centered(true);
+        fog->set_z_index(atmosphere::fog_z_index);
+        fog->set_scale(godot::Vector2(level::playable_width / 64.0f,
+                                      level::playable_height / 64.0f));
+        fog->set_material(material);
+        this->add_child(fog);
+
+        console::get()->print("{} {}", io::green("atmosphere"), io::blue("forest fog on"));
     }
 
     void Level::clear_enemies()

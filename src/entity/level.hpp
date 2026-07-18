@@ -70,6 +70,7 @@ namespace rl
         void reset_level();
         void handle_restart_input();
         void apply_room_camera_limits();
+        void apply_forest_atmosphere();
 
         std::atomic<bool> m_active{ false };
         LevelState m_state{ LevelState::Playing };
