@@ -136,8 +136,13 @@ namespace rl::inline ui
         }
 
         if (level_state == LevelState::Victory)
-            this->start_narrative(narrative::victory_text, narrative::victory_hint);
-        else if (level_state == LevelState::Defeat)
+        {
+            // Day12：全屏结语由 ending_screen 接管，Console 不再播胜利叙事。
+            this->stop_narrative();
+            return;
+        }
+
+        if (level_state == LevelState::Defeat)
             this->start_narrative(narrative::defeat_text, narrative::defeat_hint);
     }
 

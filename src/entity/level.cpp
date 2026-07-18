@@ -259,7 +259,7 @@ namespace rl
 
         if (m_state == LevelState::Victory)
         {
-            this->emit_signal(event::run_restart);
+            // Day12：结语层处理回标题；Victory 下忽略 R，避免与结语抢输入。
             return;
         }
 

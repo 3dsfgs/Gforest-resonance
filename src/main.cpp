@@ -35,7 +35,7 @@ namespace rl
     void Main::_ready()
     {
         this->apply_default_settings();
-        // Day9：不自动进关；等生日 UI 调用 begin_run()。
+        // Day9+：不自动进关；标题/生日 UI 调用 begin_run()。
     }
 
     void Main::begin_run()
@@ -44,6 +44,13 @@ namespace rl
             return;
 
         this->load_room(0);
+    }
+
+    void Main::return_to_title()
+    {
+        this->unload_active_level();
+        input::show_cursor();
+        console::get()->print("{}", io::green("return to title"));
     }
 
     void Main::_physics_process(double delta)
@@ -68,6 +75,29 @@ namespace rl
             engine::root_window()->set_size({ 1920, 1080 });
     }
 
+    void Main::unload_active_level()
+    {
+        if (m_main_dialog != nullptr)
+        {
+            if (godot::Node* hud_node{
+                    m_main_dialog->find_child(name::ui::heart_hud, true, false) })
+            {
+                if (auto* hud{ godot::Object::cast_to<HeartHud>(hud_node) })
+                    hud->disconnect_from_player();
+            }
+        }
+
+        if (m_active_level == nullptr)
+            return;
+
+        if (m_game_viewport != nullptr)
+            m_game_viewport->remove_child(m_active_level);
+
+        m_active_level->queue_free();
+        m_active_level = nullptr;
+        m_room_index = 0;
+    }
+
     void Main::bind_active_level_signals()
     {
         if (m_active_level == nullptr)
@@ -77,6 +107,8 @@ namespace rl
             signal_callback(this, on_room_cleared);
         signal<event::run_restart>::connect<Level>(m_active_level) <=>
             signal_callback(this, on_run_restart);
+        signal<event::level_state_changed>::connect<Level>(m_active_level) <=>
+            signal_callback(this, on_level_state_changed);
 
         if (m_main_dialog != nullptr)
         {
@@ -100,22 +132,7 @@ namespace rl
 
         const int previous_hearts{ carry_hearts };
 
-        if (m_main_dialog != nullptr)
-        {
-            if (godot::Node* hud_node{
-                    m_main_dialog->find_child(name::ui::heart_hud, true, false) })
-            {
-                if (auto* hud{ godot::Object::cast_to<HeartHud>(hud_node) })
-                    hud->disconnect_from_player();
-            }
-        }
-
-        if (m_active_level != nullptr)
-        {
-            m_game_viewport->remove_child(m_active_level);
-            m_active_level->queue_free();
-            m_active_level = nullptr;
-        }
+        this->unload_active_level();
 
         m_room_index = room_index;
         resource::preload::packed_scene<Level> level_scene{
@@ -149,7 +166,19 @@ namespace rl
     [[signal_slot]]
     void Main::on_run_restart()
     {
+        // Day12：Victory 不再走这里；Defeat 仍可能 reset 当前房（Level 内处理）。
+        // 若仍收到整局重开，回到房 1。
         console::get()->print("{}", io::green("run restart"));
         this->load_room(0);
+    }
+
+    [[signal_slot]]
+    void Main::on_level_state_changed(const int state)
+    {
+        if (static_cast<LevelState>(state) != LevelState::Victory)
+            return;
+
+        console::get()->print("{}", io::green("run victory"));
+        this->emit_signal(event::run_victory);
     }
 }

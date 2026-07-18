@@ -101,6 +101,16 @@ namespace rl::inline constants
 
         constexpr inline auto victory_hint{ "按 R 可重新开始本关" };
         constexpr inline auto defeat_hint{ "按 R 重新开始" };
+
+        /**
+         * Day11–12 全屏结语（GDScript ending_screen 为主展示面；
+         * 此处保留同步文案供文档/兜底）。
+         */
+        constexpr inline auto ending_epilogue{
+            "你走出了这片森林。\n"
+            "困住你的从来不是黑暗，而是忘了自己能发光。\n"
+            "那些弯下腰的时刻不是认输，是为了下一次起跳。\n"
+            "呼吸还在。脚步还在。你已经比进来时，更像自己。" };
     }
 
     namespace combat
@@ -208,6 +218,7 @@ namespace rl::inline constants
         constexpr inline auto level_state_changed{ "level_state_changed" };
         constexpr inline auto room_cleared{ "room_cleared" };
         constexpr inline auto run_restart{ "run_restart" };
+        constexpr inline auto run_victory{ "run_victory" };
         constexpr inline auto body_entered{ "body_entered" };
         constexpr inline auto body_exited{ "body_exited" };
         constexpr inline auto signal_example{ "custom_signal_example" };
@@ -327,6 +338,14 @@ namespace rl::inline constants
             constexpr inline auto player_hurt{ "res://assets/audio/sfx/retro/hurt2.ogg" };
             /** Kenney retro pack — dash whoosh 占位（可换成专用冲刺音）。 */
             constexpr inline auto player_dash{ "res://assets/audio/sfx/retro/laser1.ogg" };
+        }
+
+        namespace music
+        {
+            /** Day11–12 分场景 BGM（Kenney loops 占位，可整段替换）。 */
+            constexpr inline auto title{ "res://assets/audio/music/loops/flowing_rocks.ogg" };
+            constexpr inline auto combat{ "res://assets/audio/music/loops/mission_plausible.ogg" };
+            constexpr inline auto ending{ "res://assets/audio/music/loops/night_at-the-beach.ogg" };
         }
 
         namespace vfx
