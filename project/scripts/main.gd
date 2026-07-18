@@ -1,12 +1,12 @@
 extends Main
 
-const BirthdayGateScene := preload("res://scenes/ui/birthday_gate.tscn")
+const TitleScreenScene := preload("res://scenes/ui/title_screen.tscn")
 
 
 func _ready() -> void:
-	# C++ Main::_ready 只做默认设置，不进关；这里弹出生日门。
-	var gate := BirthdayGateScene.instantiate()
-	add_child(gate)
+	# 流程：标题 → 生日门 → Main.begin_run() → 关卡
+	var title := TitleScreenScene.instantiate()
+	add_child(title)
 
 
 func _on_custom_signal_example(delta_time):

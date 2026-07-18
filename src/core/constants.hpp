@@ -303,11 +303,18 @@ namespace rl::inline constants
         {
             constexpr inline auto MainDialog{ "res://scenes/ui/main_dialog.tscn" };
             constexpr inline auto BirthdayGate{ "res://scenes/ui/birthday_gate.tscn" };
+            constexpr inline auto TitleScreen{ "res://scenes/ui/title_screen.tscn" };
         }
 
         namespace data
         {
             constexpr inline auto buff_rules{ "res://data/buff_rules.json" };
+        }
+
+        namespace art
+        {
+            /** Day10–11 标题全出血背景；缺失时用纯色占位。 */
+            constexpr inline auto title_bg{ "res://assets/art/title/title_bg.png" };
         }
 
         namespace audio
