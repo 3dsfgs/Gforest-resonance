@@ -6,6 +6,7 @@
 #include "core/constants.hpp"
 #include "entity/character/character.hpp"
 #include "entity/character/enemy.hpp"
+#include "entity/character/player.hpp"
 #include "entity/projectile/projectile.hpp"
 #include "singletons/console.hpp"
 #include "util/bind.hpp"
@@ -77,13 +78,38 @@ namespace rl
         sync_facing_to_velocity(velocity);
     }
 
+    void Projectile::configure_as_enemy_shot()
+    {
+        m_hostile_to_player = true;
+        this->set_collision_mask(static_cast<uint32_t>(LayerID::Walls) |
+                                  static_cast<uint32_t>(LayerID::Player));
+    }
+
     [[signal_slot]]
     void Projectile::on_body_entered(godot::Node* body)
     {
         if (m_hit || body == nullptr)
             return;
 
-        if (Enemy* enemy{ godot::Object::cast_to<Enemy>(body) })
+        if (m_hostile_to_player)
+        {
+            if (Player* player{ godot::Object::cast_to<Player>(body) })
+            {
+                if (player->take_damage(combat::projectile_damage_hearts))
+                {
+                    console::get()->print("{} {}", io::red("enemy shot"),
+                                          io::yellow("-1 heart"));
+                }
+                m_hit = true;
+                this->queue_free();
+                return;
+            }
+
+            // Ignore allied enemies; still bounce/destroy on walls below.
+            if (godot::Object::cast_to<Enemy>(body) != nullptr)
+                return;
+        }
+        else if (Enemy* enemy{ godot::Object::cast_to<Enemy>(body) })
         {
             if (enemy->take_damage(combat::projectile_damage_hearts))
             {
@@ -100,26 +126,29 @@ namespace rl
             return;
         }
 
-        if (Character* character{ godot::Object::cast_to<Character>(body) })
+        if (!m_hostile_to_player)
         {
-            if (!m_has_bounced)
-                return;
-
-            const float dist_from_bounce{
-                static_cast<float>(character->get_global_position().distance_to(m_bounce_point))
-            };
-            if (dist_from_bounce > combat::ricochet_self_damage_radius)
-                return;
-
-            if (character->take_damage(combat::ricochet_self_damage_hearts))
+            if (Character* character{ godot::Object::cast_to<Character>(body) })
             {
-                console::get()->print("{} {}", io::red("ricochet self-hit"),
-                                      io::yellow("-1 heart"));
-            }
+                if (!m_has_bounced)
+                    return;
 
-            m_hit = true;
-            this->queue_free();
-            return;
+                const float dist_from_bounce{
+                    static_cast<float>(character->get_global_position().distance_to(m_bounce_point))
+                };
+                if (dist_from_bounce > combat::ricochet_self_damage_radius)
+                    return;
+
+                if (character->take_damage(combat::ricochet_self_damage_hearts))
+                {
+                    console::get()->print("{} {}", io::red("ricochet self-hit"),
+                                          io::yellow("-1 heart"));
+                }
+
+                m_hit = true;
+                this->queue_free();
+                return;
+            }
         }
 
         if (godot::PhysicsBody2D* physics_body{ godot::Object::cast_to<godot::PhysicsBody2D>(body) })
@@ -141,7 +170,8 @@ namespace rl
             m_has_bounced = true;
             m_bounce_point = this->get_global_position();
             m_pending_bounce_realign = true;
-            this->set_collision_mask(this->get_collision_mask() | collision::player_layer);
+            if (!m_hostile_to_player)
+                this->set_collision_mask(this->get_collision_mask() | collision::player_layer);
         }
     }
 

@@ -53,6 +53,7 @@ namespace rl
         static void _bind_methods();
 
         [[signal_slot]] void on_player_spawn_projectile(godot::Node* obj);
+        [[signal_slot]] void on_enemy_spawn_projectile(godot::Node* obj);
         [[signal_slot]] void on_character_position_changed(const godot::Object* const obj,
                                                            godot::Vector2 location) const;
         [[signal_slot]] void on_player_died();
@@ -61,6 +62,7 @@ namespace rl
     private:
         void spawn_player_at_marker();
         void spawn_enemies_from_markers();
+        void spawn_projectile_from_marker(godot::Node* obj, bool from_enemy);
         void clear_enemies();
         void clear_projectiles();
         void set_player_input_enabled(bool enabled);

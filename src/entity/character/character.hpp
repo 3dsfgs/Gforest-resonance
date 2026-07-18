@@ -50,6 +50,9 @@ namespace rl
         void reset_hearts();
         void apply_hearts(int hearts);
 
+        [[nodiscard]] double get_movement_speed() const;
+        void set_movement_speed(double move_speed);
+
     protected:
         virtual void process_slide_collisions();
         /** Only Player owns the active camera; enemies must not steal current. */
@@ -64,11 +67,9 @@ namespace rl
         void end_invincibility();
         void start_hit_flash();
         void update_damage_visual();
-        [[property]] double get_movement_speed() const;
         [[property]] double get_movement_friction() const;
         [[property]] double get_rotation_speed() const;
 
-        [[property]] void set_movement_speed(const double move_speed);
         [[property]] void set_movement_friction(const double move_friction);
         [[property]] void set_rotation_speed(const double rotation_speed);
         [[property]] void set_hearts(int hearts);

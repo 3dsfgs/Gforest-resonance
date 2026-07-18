@@ -22,8 +22,13 @@ namespace rl
 
         void set_max(const int max)
         {
-            max_hearts = std::max(1, max);
-            hearts = std::min(hearts, max_hearts);
+            const int new_max{ std::max(1, max) };
+            // Raising max (e.g. Enemy → EnemyBrute ctor) must refill; lowering clamps.
+            if (new_max > max_hearts)
+                hearts = new_max;
+            else
+                hearts = std::min(hearts, new_max);
+            max_hearts = new_max;
         }
 
         /** @return hearts actually lost (0 if already dead). */

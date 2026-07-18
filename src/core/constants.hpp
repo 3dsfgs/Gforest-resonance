@@ -15,6 +15,7 @@ namespace rl::inline constants
         constexpr inline auto physics_box{ "PhysicsBox" };
         constexpr inline auto spawn_point{ "SpawnPoint" };
         constexpr inline auto enemy_spawn_prefix{ "EnemySpawn" };
+        constexpr inline auto enemy_brute_spawn_prefix{ "EnemyBruteSpawn" };
         constexpr inline auto enemy_spawn1{ "EnemySpawn1" };
         constexpr inline auto damage_zone{ "DamageZone" };
         constexpr inline auto death_pit{ "DeathPit" };
@@ -39,6 +40,7 @@ namespace rl::inline constants
         {
             constexpr inline auto player{ "Player" };
             constexpr inline auto enemy{ "Enemy" };
+            constexpr inline auto enemy_brute{ "EnemyBrute" };
             constexpr inline auto firing_pt{ "FiringPoint" };
             constexpr inline auto sprite{ "PlayerSprite" };
         }
@@ -110,12 +112,26 @@ namespace rl::inline constants
 
         /** Hearts removed per pulse projectile hit (P0-B03). */
         constexpr inline int projectile_damage_hearts{ 1 };
-        /** Default enemy heart count (P0-B04). */
-        constexpr inline int enemy_default_hearts{ 3 };
+        /** Day6 快而脆（侦察机）默认血量。 */
+        constexpr inline int enemy_default_hearts{ 2 };
         /** Hearts removed when an enemy touches the player (P0-B04). */
         constexpr inline int enemy_contact_damage_hearts{ 1 };
-        /** Enemy chase speed — slower than default player speed (P0-B04). */
-        constexpr inline double enemy_movement_speed{ 350.0 };
+        /** Day6 快而脆追击速度。 */
+        constexpr inline double enemy_movement_speed{ 420.0 };
+        /** Day6 慢而肉（坦克）血量。 */
+        constexpr inline int enemy_brute_hearts{ 5 };
+        /** Day6 慢而肉追击速度。 */
+        constexpr inline double enemy_brute_movement_speed{ 200.0 };
+        /** Day6 坦克冲撞：触发距离 / 冲刺速度倍率 / 持续时间 / 冷却。 */
+        constexpr inline float enemy_charge_trigger_range{ 320.0f };
+        constexpr inline float enemy_charge_speed_mult{ 3.2f };
+        constexpr inline double enemy_charge_duration{ 0.45 };
+        constexpr inline double enemy_charge_cooldown{ 2.2 };
+        constexpr inline double enemy_charge_windup{ 0.25 };
+        /** Day6 侦察机远程：射程 / 射速（发/秒）。 */
+        constexpr inline float enemy_ranged_range{ 520.0f };
+        constexpr inline float enemy_ranged_min_range{ 140.0f };
+        constexpr inline double enemy_ranged_fire_rate{ 1.2 };
         /** Ricochet self-damage radius from bounce point (pixels). */
         constexpr inline float ricochet_self_damage_radius{ 120.0f };
         constexpr inline int ricochet_self_damage_hearts{ 1 };
@@ -254,6 +270,8 @@ namespace rl::inline constants
             constexpr inline auto Player{ "res://scenes/characters/player.tscn" };
             constexpr inline auto Bullet{ "res://scenes/projectiles/bullet.tscn" };
             constexpr inline auto Enemy{ "res://scenes/characters/enemy.tscn" };
+            /** Day6：慢而肉变体。 */
+            constexpr inline auto EnemyBrute{ "res://scenes/characters/enemy_brute.tscn" };
 
             constexpr inline const char* room_paths[level::room_count]{
                 Level1,

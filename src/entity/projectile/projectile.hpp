@@ -42,6 +42,9 @@ namespace rl
         [[property]] void set_acceleration(double acceleration);
         [[property]] void set_velocity(double velocity);
 
+        /** Scout ranged: collide with Player; do not damage allied enemies. */
+        void configure_as_enemy_shot();
+
     protected:
         static void _bind_methods()
         {
@@ -70,6 +73,7 @@ namespace rl
         bool m_has_bounced{ false };
         bool m_pending_bounce_realign{ false };
         bool m_flight_speed_captured{ false };
+        bool m_hostile_to_player{ false };
         int m_wall_bounce_count{ 0 };
         /** Captured flight speed after launch; restored after wall bounce. */
         double m_flight_speed{ 0.0 };

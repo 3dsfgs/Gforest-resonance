@@ -10,6 +10,7 @@
 #include "core/constants.hpp"
 #include "entity/character/character.hpp"
 #include "entity/character/enemy.hpp"
+#include "entity/character/enemy_brute.hpp"
 #include "entity/controller/enemy_controller.hpp"
 #include "entity/controller/player_controller.hpp"
 #include "entity/level.hpp"
@@ -119,6 +120,7 @@ namespace rl
     void Level::spawn_enemies_from_markers()
     {
         resource::preload::packed_scene<Enemy> enemy_scene{ path::scene::Enemy };
+        resource::preload::packed_scene<EnemyBrute> brute_scene{ path::scene::EnemyBrute };
 
         const int child_count{ this->get_child_count() };
         for (int i = 0; i < child_count; ++i)
@@ -128,22 +130,30 @@ namespace rl
                 continue;
 
             const godot::String child_name{ child->get_name() };
-            if (!child_name.begins_with(name::level::enemy_spawn_prefix))
+            const bool is_brute{ child_name.begins_with(name::level::enemy_brute_spawn_prefix) };
+            const bool is_scout{ child_name.begins_with(name::level::enemy_spawn_prefix) };
+            if (!is_brute && !is_scout)
                 continue;
 
             godot::Marker2D* marker{ try_gdcast<godot::Marker2D>(child) };
             if (marker == nullptr)
                 continue;
 
-            Enemy* enemy{ enemy_scene.instantiate() };
+            Enemy* enemy{ is_brute ? static_cast<Enemy*>(brute_scene.instantiate())
+                                   : enemy_scene.instantiate() };
             if (enemy == nullptr)
                 continue;
 
-            enemy->set_controller(memnew(EnemyController));
+            auto* controller{ memnew(EnemyController) };
+            controller->set_behavior(is_brute ? EnemyController::Behavior::BruteCharge
+                                              : EnemyController::Behavior::ScoutRanged);
+            enemy->set_controller(controller);
             enemy->set_global_position(marker->get_global_position());
             this->add_child(enemy);
 
             signal<event::died>::connect<Enemy>(enemy) <=> signal_callback(this, on_enemy_died);
+            signal<event::spawn_projectile>::connect<Enemy>(enemy) <=>
+                signal_callback(this, on_enemy_spawn_projectile);
             ++m_enemy_count;
         }
     }
@@ -293,6 +303,7 @@ namespace rl
     {
         bind_member_function(Level, on_character_position_changed);
         bind_member_function(Level, on_player_spawn_projectile);
+        bind_member_function(Level, on_enemy_spawn_projectile);
         bind_member_function(Level, on_player_died);
         bind_member_function(Level, on_enemy_died);
         signal_binding<Level, event::level_state_changed>::add<int>();
@@ -303,38 +314,39 @@ namespace rl
     [[signal_slot]]
     void Level::on_player_spawn_projectile(godot::Node* obj)
     {
+        this->spawn_projectile_from_marker(obj, false);
+    }
+
+    [[signal_slot]]
+    void Level::on_enemy_spawn_projectile(godot::Node* obj)
+    {
+        this->spawn_projectile_from_marker(obj, true);
+    }
+
+    void Level::spawn_projectile_from_marker(godot::Node* obj, const bool from_enemy)
+    {
         if (m_state != LevelState::Playing)
             return;
 
         Projectile* projectile{ m_projectile_spawner->spawn_projectile() };
-        if (projectile != nullptr)
-        {
-            // Add first so global transforms resolve against the level tree.
-            // this->add_child(projectile);
+        if (projectile == nullptr)
+            return;
 
-            godot::Marker2D* firing_pt{ try_gdcast<godot::Marker2D>(obj) };
-            if (firing_pt != nullptr)
-            {
-                const double spread{ combat::projectile_spread_radians };
-                const double yaw_jitter{
-                    spread > 0.0
-                        ? godot::UtilityFunctions::randf_range(-spread, spread)
-                        : 0.0
-                };
-                projectile->set_position(firing_pt->get_global_position());
-                projectile->set_rotation(firing_pt->get_global_rotation() + yaw_jitter);
-                /*const double facing{ firing_pt->get_global_rotation() + yaw_jitter };
-                const godot::Vector2 muzzle{
-                    firing_pt->get_global_position() +
-                    godot::Vector2(static_cast<real_t>(godot::Math::cos(facing)),
-                                   static_cast<real_t>(godot::Math::sin(facing))) *
-                        static_cast<real_t>(combat::projectile_muzzle_forward_offset)
-                };*/
-                // projectile->set_global_position(muzzle);
-                // projectile->set_global_rotation(facing);
-            }
-            this->add_child(projectile);
+        if (from_enemy)
+            projectile->configure_as_enemy_shot();
+
+        godot::Marker2D* firing_pt{ try_gdcast<godot::Marker2D>(obj) };
+        if (firing_pt != nullptr)
+        {
+            const double spread{ from_enemy ? combat::projectile_spread_radians * 2.0
+                                            : combat::projectile_spread_radians };
+            const double yaw_jitter{
+                spread > 0.0 ? godot::UtilityFunctions::randf_range(-spread, spread) : 0.0
+            };
+            projectile->set_position(firing_pt->get_global_position());
+            projectile->set_rotation(firing_pt->get_global_rotation() + yaw_jitter);
         }
+        this->add_child(projectile);
     }
 
     [[signal_slot]]
