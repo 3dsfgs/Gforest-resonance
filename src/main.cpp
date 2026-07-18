@@ -35,8 +35,15 @@ namespace rl
     void Main::_ready()
     {
         this->apply_default_settings();
-        if (m_active_level == nullptr)
-            this->load_room(0);
+        // Day9：不自动进关；等生日 UI 调用 begin_run()。
+    }
+
+    void Main::begin_run()
+    {
+        if (m_active_level != nullptr)
+            return;
+
+        this->load_room(0);
     }
 
     void Main::_physics_process(double delta)

@@ -16,6 +16,7 @@
 #include "entity/level.hpp"
 #include "entity/projectile/projectile.hpp"
 #include "singletons/console.hpp"
+#include "util/birth_buff.hpp"
 #include "util/bind.hpp"
 #include "util/conversions.hpp"
 #include "util/debug.hpp"
@@ -85,6 +86,7 @@ namespace rl
         this->add_child(m_player);
         this->spawn_player_at_marker();
         this->add_child(m_projectile_spawner);
+        birth_buff::apply_from_disk(m_player, m_projectile_spawner);
         this->spawn_enemies_from_markers();
         this->apply_room_camera_limits();
 

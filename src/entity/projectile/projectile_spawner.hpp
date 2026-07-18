@@ -24,10 +24,10 @@ namespace rl
 
         Projectile* spawn_projectile();
 
-    protected:
-        [[property]] double get_fire_rate() const;
-        [[property]] void set_fire_rate(double fire_rate);
+        double get_fire_rate() const;
+        void set_fire_rate(double fire_rate);
 
+    protected:
         static void _bind_methods();
 
     private:

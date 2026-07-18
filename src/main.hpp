@@ -24,10 +24,14 @@ namespace rl
     protected:
         void apply_default_settings();
 
+        /** Called by birthday UI after profile.json is written. */
+        void begin_run();
+
         static void _bind_methods()
         {
             bind_member_function(Main, on_room_cleared);
             bind_member_function(Main, on_run_restart);
+            bind_member_function(Main, begin_run);
             signal_binding<Main, event::signal_example>::add<double>();
         }
 

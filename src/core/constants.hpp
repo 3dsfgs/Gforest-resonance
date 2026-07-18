@@ -302,6 +302,12 @@ namespace rl::inline constants
         namespace ui
         {
             constexpr inline auto MainDialog{ "res://scenes/ui/main_dialog.tscn" };
+            constexpr inline auto BirthdayGate{ "res://scenes/ui/birthday_gate.tscn" };
+        }
+
+        namespace data
+        {
+            constexpr inline auto buff_rules{ "res://data/buff_rules.json" };
         }
 
         namespace audio

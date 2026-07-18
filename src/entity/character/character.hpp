@@ -49,6 +49,8 @@ namespace rl
         bool take_damage(int hearts = 1, bool bypass_invincibility = false);
         void reset_hearts();
         void apply_hearts(int hearts);
+        void set_hearts(int hearts);
+        void set_max_hearts(int max_hearts);
 
         [[nodiscard]] double get_movement_speed() const;
         void set_movement_speed(double move_speed);
@@ -72,8 +74,6 @@ namespace rl
 
         [[property]] void set_movement_friction(const double move_friction);
         [[property]] void set_rotation_speed(const double rotation_speed);
-        [[property]] void set_hearts(int hearts);
-        [[property]] void set_max_hearts(int max_hearts);
 
         [[signal_slot]] void on_character_shoot();
         [[signal_slot]] void on_character_rotate(double rotation_angle, double delta_time);
