@@ -63,7 +63,7 @@ namespace rl
         /** Player: red-orange danger flash; default/enemy: cyan-white hit confirm. */
         virtual godot::Color hit_flash_color() const;
         void emit_hearts_changed();
-        void start_invincibility();
+        void start_invincibility(double duration = -1.0);
         void end_invincibility();
         void start_hit_flash();
         void update_damage_visual();
@@ -77,8 +77,8 @@ namespace rl
 
         [[signal_slot]] void on_character_shoot();
         [[signal_slot]] void on_character_rotate(double rotation_angle, double delta_time);
-        [[signal_slot]] void on_character_movement(godot::Vector2 movement_velocity,
-                                                   double delta_time);
+        [[signal_slot]] virtual void on_character_movement(godot::Vector2 movement_velocity,
+                                                           double delta_time);
 
     protected:
         static void _bind_methods()

@@ -180,6 +180,17 @@ namespace rl::inline constants
         constexpr inline float sfx_enemy_hit_volume_db{ 0.0f };
         constexpr inline float sfx_enemy_kill_volume_db{ 0.0f };
         constexpr inline float sfx_player_hurt_volume_db{ 0.0f };
+        /** Day7–8 冲刺音效。 */
+        constexpr inline float sfx_player_dash_volume_db{ -2.0f };
+
+        /**
+         * Day7–8 冲刺/闪避：距离 ≈ move_speed * dash_speed_mult * dash_duration
+         * 默认约 500 * 3.8 * 0.16 ≈ 304px；冷却与短无敌可按走测微调。
+         */
+        constexpr inline double dash_duration{ 0.16 };
+        constexpr inline double dash_speed_mult{ 3.8 };
+        constexpr inline double dash_cooldown{ 0.9 };
+        constexpr inline double dash_invincibility_duration{ 0.22 };
     }
 
     namespace event
@@ -193,6 +204,7 @@ namespace rl::inline constants
         constexpr inline auto character_move{ "character_move" };
         constexpr inline auto character_rotate{ "character_rotate" };
         constexpr inline auto character_shoot{ "character_shoot" };
+        constexpr inline auto character_dash{ "character_dash" };
         constexpr inline auto level_state_changed{ "level_state_changed" };
         constexpr inline auto room_cleared{ "room_cleared" };
         constexpr inline auto run_restart{ "run_restart" };
@@ -300,6 +312,8 @@ namespace rl::inline constants
             constexpr inline auto enemy_kill{ "res://assets/audio/sfx/retro/explosion2.ogg" };
             /** Kenney retro pack — player hurt. */
             constexpr inline auto player_hurt{ "res://assets/audio/sfx/retro/hurt2.ogg" };
+            /** Kenney retro pack — dash whoosh 占位（可换成专用冲刺音）。 */
+            constexpr inline auto player_dash{ "res://assets/audio/sfx/retro/laser1.ogg" };
         }
 
         namespace vfx

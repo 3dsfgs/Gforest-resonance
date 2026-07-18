@@ -240,9 +240,13 @@ namespace rl
             end_invincibility();
     }
 
-    void Character::start_invincibility()
+    void Character::start_invincibility(const double duration)
     {
-        m_invincibility_remaining = combat::invincibility_duration;
+        const double requested{ duration > 0.0 ? duration : combat::invincibility_duration };
+        // Do not shorten an existing longer i-frame window (e.g. post-hit 1.0s).
+        if (requested > m_invincibility_remaining)
+            m_invincibility_remaining = requested;
+
         m_blink_timer = 0.0;
         m_blink_visible = true;
         this->set_process(true);

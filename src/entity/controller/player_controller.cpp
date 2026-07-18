@@ -13,8 +13,13 @@ namespace rl
 {
     void PlayerController::process_action_input(godot::Input* const input, double delta_time)
     {
-        if (input->is_action_pressed("shoot"))
+        (void)delta_time;
+
+        if (input->is_action_pressed(input::action::shoot))
             this->emit_signal(event::character_shoot);
+
+        if (input->is_action_just_pressed(input::action::dash))
+            this->emit_signal(event::character_dash);
     }
 
     void PlayerController::process_movement_input(godot::Input* const input, double delta_time)

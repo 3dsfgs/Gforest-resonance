@@ -17,6 +17,7 @@ namespace rl::inline ui
         ~HeartHud() = default;
 
         void _ready() override;
+        void _process(double delta_time) override;
         void _draw() override;
 
         void connect_to_player();
@@ -37,8 +38,11 @@ namespace rl::inline ui
         }
 
     private:
+        void update_layout_size();
+
         Player* m_player{ nullptr };
         int m_current_hearts{ 5 };
         int m_max_hearts{ 5 };
+        double m_dash_ready_ratio{ 1.0 };
     };
 }
