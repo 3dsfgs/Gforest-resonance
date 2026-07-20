@@ -34,8 +34,20 @@ namespace rl
 
     void teardown_static_objects()
     {
-        rl::engine::get()->unregister_singleton("Console");
-        memdelete(console_singleton);
+        if (console_singleton != nullptr)
+        {
+            console_singleton->clear_context();
+            console_singleton->stop_logging();
+        }
+
+        if (rl::engine::get() != nullptr)
+            rl::engine::get()->unregister_singleton("Console");
+
+        if (console_singleton != nullptr)
+        {
+            memdelete(console_singleton);
+            console_singleton = nullptr;
+        }
     }
 
     void initialize_extension_module(godot::ModuleInitializationLevel init_level)

@@ -1,3 +1,4 @@
+#include <godot_cpp/classes/canvas_item.hpp>
 #include <godot_cpp/classes/canvas_layer.hpp>
 #include <godot_cpp/classes/control.hpp>
 
@@ -38,6 +39,8 @@ namespace rl::inline ui
         if (engine::editor_active())
             return;
 
+        this->apply_release_shell();
+
         Console<godot::RichTextLabel>* game_console{ console::get() };
 
         godot::Node* root{ scene::tree::root_node(this) };
@@ -49,6 +52,29 @@ namespace rl::inline ui
         game_console->set_context(m_console_label);
 
         this->call_deferred("connect_to_level");
+    }
+
+    void MainDialog::apply_release_shell()
+    {
+        // Exported release: hide template debug chrome (File/Debug menu + console dock).
+        if (engine::debug_build())
+            return;
+
+        if (godot::Node* menu{ this->find_child("FileMenuContainer", true, false) })
+        {
+            if (godot::CanvasItem* item{ godot::Object::cast_to<godot::CanvasItem>(menu) })
+                item->set_visible(false);
+        }
+
+        if (godot::Node* lower{ this->find_child("LowerDialogVertLayout", true, false) })
+        {
+            if (godot::CanvasItem* item{ godot::Object::cast_to<godot::CanvasItem>(lower) })
+                item->set_visible(false);
+        }
+
+        // Keep spdlog alive until process exit; only detach the hidden console widget.
+        if (console::get() != nullptr)
+            console::get()->clear_context();
     }
 
     Level* MainDialog::find_level_in_tree()

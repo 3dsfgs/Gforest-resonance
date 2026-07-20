@@ -40,6 +40,7 @@ namespace rl::inline ui
         void reveal_next_character();
         void begin_line_pause();
         void finish_narrative();
+        void apply_release_shell();
 
     private:
         Level* find_level_in_tree();

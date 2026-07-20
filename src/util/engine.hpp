@@ -23,5 +23,7 @@ namespace rl::inline utils
         static void set_fps(const uint32_t fps);
         static int32_t max_fps();
         static bool editor_active();
+        /** False for exported release builds (true in editor / debug export). */
+        static bool debug_build();
     };
 }

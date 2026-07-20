@@ -51,8 +51,16 @@ namespace rl
 
         void stop_logging()
         {
-            m_logger->flush();
-            m_stop = true;
+            if (m_stop.exchange(true))
+                return;
+
+            m_gui_console.store(nullptr, std::memory_order_release);
+            if (m_logger)
+                m_logger->flush();
+
+            // flush_every() starts a background thread; without shutdown the process can hang on exit.
+            spdlog::shutdown();
+            m_logger.reset();
         }
 
         void init_loggers()
@@ -96,6 +104,8 @@ namespace rl
         template <typename... TArgs>
         void print(fmt::format_string<TArgs...> format_str, TArgs&&... args)
         {
+            if (m_stop.load(std::memory_order_relaxed) || m_logger == nullptr)
+                return;
             m_logger->info(format_str, std::forward<TArgs>(args)...);
         }
 

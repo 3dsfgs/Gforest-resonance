@@ -2,6 +2,8 @@
 .import/
 .out/
 out/
+dist/
+project/build_win/
 cmake-build-*/
 
 export.cfg

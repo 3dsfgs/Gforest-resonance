@@ -1,6 +1,7 @@
 #include <godot_cpp/classes/engine.hpp>
 #include <godot_cpp/classes/main_loop.hpp>
 #include <godot_cpp/classes/node.hpp>
+#include <godot_cpp/classes/os.hpp>
 #include <godot_cpp/classes/scene_tree.hpp>
 #include <godot_cpp/classes/window.hpp>
 
@@ -53,5 +54,11 @@ namespace rl::inline utils
     {
         auto engine{ engine::get() };
         return engine->is_editor_hint();
+    }
+
+    bool engine::debug_build()
+    {
+        godot::OS* os{ godot::OS::get_singleton() };
+        return os != nullptr && os->is_debug_build();
     }
 }
