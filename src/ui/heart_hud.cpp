@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <array>
 
 #include <godot_cpp/core/math.hpp>
 #include <godot_cpp/variant/callable.hpp>
@@ -20,12 +21,52 @@ namespace rl::inline ui
 {
     namespace
     {
-        constexpr float heart_radius{ 10.0f };
+        constexpr float heart_half_width{ 11.0f };
+        constexpr float heart_half_height{ 10.0f };
         constexpr float heart_spacing{ 28.0f };
         constexpr float heart_padding{ 8.0f };
         constexpr float dash_bar_height{ 8.0f };
         constexpr float dash_bar_gap{ 6.0f };
         constexpr float dash_bar_min_width{ 120.0f };
+
+        godot::PackedVector2Array heart_polygon(const godot::Vector2 center)
+        {
+            // 经典心形轮廓（局部坐标 → 平移到 center）
+            static const std::array<godot::Vector2, 10> k_unit_points{ {
+                { 0.0f, 3.5f },
+                { -10.0f, -2.0f },
+                { -5.5f, -9.5f },
+                { 0.0f, -6.0f },
+                { 5.5f, -9.5f },
+                { 10.0f, -2.0f },
+                { 6.0f, 4.0f },
+                { 0.0f, 8.5f },
+                { -6.0f, 4.0f },
+                { -10.0f, -2.0f },
+            } };
+
+            godot::PackedVector2Array points;
+            points.resize(static_cast<int>(k_unit_points.size()));
+            for (std::size_t i = 0; i < k_unit_points.size(); ++i)
+            {
+                const godot::Vector2 scaled{ k_unit_points[i].x * (heart_half_width / 10.0f),
+                                             k_unit_points[i].y * (heart_half_height / 10.0f) };
+                points[static_cast<int>(i)] = center + scaled;
+            }
+            return points;
+        }
+
+        void draw_heart(godot::Control* control, const godot::Vector2 center, const godot::Color fill,
+                        const godot::Color outline)
+        {
+            const godot::PackedVector2Array points{ heart_polygon(center) };
+            control->draw_colored_polygon(points, fill);
+            for (int i = 0; i < points.size(); ++i)
+            {
+                const int next{ (i + 1) % points.size() };
+                control->draw_line(points[i], points[next], outline, 1.5f, true);
+            }
+        }
     }
 
     void HeartHud::_ready()
@@ -122,7 +163,7 @@ namespace rl::inline ui
         const float hearts_width{
             heart_padding * 2.0f + heart_spacing * static_cast<float>(m_max_hearts) };
         const float width{ std::max(hearts_width, dash_bar_min_width) };
-        const float height{ heart_padding * 2.0f + heart_radius * 2.0f + dash_bar_gap +
+        const float height{ heart_padding * 2.0f + heart_half_height * 2.0f + dash_bar_gap +
                             dash_bar_height };
         this->set_custom_minimum_size({ width, height });
         this->set_size({ width, height });
@@ -141,15 +182,17 @@ namespace rl::inline ui
         for (int i = 0; i < m_max_hearts; ++i)
         {
             const bool filled{ i < m_current_hearts };
-            const godot::Color color = filled ? godot::Color{ 1.0f, 0.22f, 0.33f }
-                                              : godot::Color{ 0.28f, 0.28f, 0.34f, 0.85f };
-            const godot::Vector2 center{ heart_padding + heart_radius +
+            const godot::Color fill = filled ? godot::Color{ 1.0f, 0.78f, 0.22f, 0.95f }
+                                             : godot::Color{ 0.28f, 0.28f, 0.34f, 0.55f };
+            const godot::Color outline = filled ? godot::Color{ 0.55f, 0.32f, 0.08f, 0.9f }
+                                                : godot::Color{ 0.4f, 0.4f, 0.48f, 0.7f };
+            const godot::Vector2 center{ heart_padding + heart_half_width +
                                              static_cast<float>(i) * heart_spacing,
-                                         heart_padding + heart_radius };
-            this->draw_circle(center, heart_radius, color);
+                                         heart_padding + heart_half_height };
+            draw_heart(this, center, fill, outline);
         }
 
-        const float bar_y{ heart_padding + heart_radius * 2.0f + dash_bar_gap };
+        const float bar_y{ heart_padding + heart_half_height * 2.0f + dash_bar_gap };
         const float bar_width{ this->get_size().x - heart_padding * 2.0f };
         const godot::Rect2 track{ heart_padding, bar_y, bar_width, dash_bar_height };
         this->draw_rect(track, godot::Color{ 0.18f, 0.2f, 0.24f, 0.9f });

@@ -9,6 +9,7 @@
 #include <godot_cpp/variant/vector2.hpp>
 
 #include "core/constants.hpp"
+#include "entity/camera.hpp"
 #include "entity/character/character.hpp"
 #include "entity/character/enemy.hpp"
 #include "entity/character/player.hpp"
@@ -35,6 +36,9 @@ namespace rl
         Character::_ready();
         this->set_collision_mask(collision::player_mask);
         emit_hearts_changed();
+
+        if (m_camera != nullptr)
+            m_camera->set_lookahead_enabled(true);
 
         if (m_character_controller != nullptr)
         {

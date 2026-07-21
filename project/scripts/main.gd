@@ -2,18 +2,31 @@ extends Main
 
 const TitleScreenScene := preload("res://scenes/ui/title_screen.tscn")
 const EndingScreenScene := preload("res://scenes/ui/ending_screen.tscn")
+const RoomTransitionScript := preload("res://scripts/room_transition.gd")
 
 
 func _ready() -> void:
 	# 流程：标题 → 生日门 → begin_run → 关卡 → 通关结语 → 回标题
 	if not run_victory.is_connected(_on_run_victory):
 		run_victory.connect(_on_run_victory)
+	if not room_advance_requested.is_connected(_on_room_advance_requested):
+		room_advance_requested.connect(_on_room_advance_requested)
 
 	var title := TitleScreenScene.instantiate()
 	add_child(title)
 
 	if MusicDirector:
 		MusicDirector.play_title()
+
+
+func _on_room_advance_requested(next_index: int, hearts: int, room_name: String) -> void:
+	if has_node("RoomTransition"):
+		return
+
+	var transition: CanvasLayer = RoomTransitionScript.new()
+	transition.name = "RoomTransition"
+	transition.setup(self, next_index, hearts, room_name)
+	add_child(transition)
 
 
 func _on_run_victory() -> void:

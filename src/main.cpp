@@ -46,6 +46,11 @@ namespace rl
         this->load_room(0);
     }
 
+    void Main::advance_to_room(const int room_index, const int carry_hearts)
+    {
+        this->load_room(room_index, carry_hearts);
+    }
+
     void Main::return_to_title()
     {
         this->unload_active_level();
@@ -158,9 +163,15 @@ namespace rl
             return;
 
         const int hearts{ m_active_level->get_player_hearts() };
+        const int next_index{ room_index + 1 };
+
+        if (next_index < 0 || next_index >= level::room_count)
+            return;
+
         console::get()->print("{} {}", io::green("room cleared"),
                               io::blue(std::to_string(room_index + 1)));
-        this->load_room(room_index + 1, hearts);
+        this->emit_signal(event::room_advance_requested, next_index, hearts,
+                          godot::String::utf8(level::room_display_names[next_index]));
     }
 
     [[signal_slot]]

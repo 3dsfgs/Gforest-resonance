@@ -23,6 +23,8 @@ namespace rl
 
         /** Called by birthday UI after profile.json is written. */
         void begin_run();
+        /** P0-4：GDScript 过场播完后加载下一房。 */
+        void advance_to_room(int room_index, int carry_hearts);
         /** Day12：卸下关卡，回到标题前调用。 */
         void return_to_title();
 
@@ -35,9 +37,11 @@ namespace rl
             bind_member_function(Main, on_run_restart);
             bind_member_function(Main, on_level_state_changed);
             bind_member_function(Main, begin_run);
+            bind_member_function(Main, advance_to_room);
             bind_member_function(Main, return_to_title);
             signal_binding<Main, event::signal_example>::add<double>();
             signal_binding<Main, event::run_victory>::add<>();
+            signal_binding<Main, event::room_advance_requested>::add<int, int, godot::String>();
         }
 
         [[signal_slot]] void on_room_cleared(int room_index);

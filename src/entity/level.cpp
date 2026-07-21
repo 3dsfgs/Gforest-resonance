@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <tuple>
 #include <godot_cpp/classes/camera2d.hpp>
 #include <godot_cpp/classes/collision_polygon2d.hpp>
 #include <godot_cpp/classes/directional_light2d.hpp>
@@ -11,7 +13,6 @@
 #include <godot_cpp/classes/sprite2d.hpp>
 #include <godot_cpp/variant/callable.hpp>
 #include <godot_cpp/variant/color.hpp>
-#include <godot_cpp/variant/utility_functions.hpp>
 #include <godot_cpp/variant/vector2.hpp>
 
 #include "core/constants.hpp"
@@ -129,8 +130,7 @@ namespace rl
 
     void Level::spawn_enemies_from_markers()
     {
-        resource::preload::packed_scene<Enemy> enemy_scene{ path::scene::Enemy };
-        resource::preload::packed_scene<EnemyBrute> brute_scene{ path::scene::EnemyBrute };
+        m_pending_spawns.clear();
 
         const int child_count{ this->get_child_count() };
         for (int i = 0; i < child_count; ++i)
@@ -149,22 +149,102 @@ namespace rl
             if (marker == nullptr)
                 continue;
 
-            Enemy* enemy{ is_brute ? static_cast<Enemy*>(brute_scene.instantiate())
-                                   : enemy_scene.instantiate() };
-            if (enemy == nullptr)
+            this->queue_enemy_spawn(marker->get_position(), is_brute);
+        }
+    }
+
+    void Level::queue_enemy_spawn(const godot::Vector2 position, const bool is_brute)
+    {
+        PendingEnemySpawn entry{};
+        entry.position = position;
+        entry.is_brute = is_brute;
+        entry.delay_remaining = spawn::telegraph_duration;
+        m_pending_spawns.push_back(entry);
+        this->queue_redraw();
+    }
+
+    void Level::finalize_enemy_spawn(const PendingEnemySpawn& pending)
+    {
+        resource::preload::packed_scene<Enemy> enemy_scene{ path::scene::Enemy };
+        resource::preload::packed_scene<EnemyBrute> brute_scene{ path::scene::EnemyBrute };
+
+        Enemy* enemy{ pending.is_brute ? static_cast<Enemy*>(brute_scene.instantiate())
+                                     : enemy_scene.instantiate() };
+        if (enemy == nullptr)
+            return;
+
+        auto* controller{ memnew(EnemyController) };
+        controller->set_behavior(pending.is_brute ? EnemyController::Behavior::BruteCharge
+                                                  : EnemyController::Behavior::ScoutRanged);
+        enemy->set_controller(controller);
+        enemy->set_position(pending.position);
+        enemy->set_modulate(godot::Color(1.0f, 1.0f, 1.0f, 0.0f));
+        this->add_child(enemy);
+
+        signal<event::died>::connect<Enemy>(enemy) <=> signal_callback(this, on_enemy_died);
+        signal<event::spawn_projectile>::connect<Enemy>(enemy) <=>
+            signal_callback(this, on_enemy_spawn_projectile);
+
+        m_fading_enemies.push_back(FadingEnemy{ enemy, spawn::fade_in_duration });
+        ++m_enemy_count;
+    }
+
+    void Level::update_pending_spawns(const double delta_time)
+    {
+        if (m_pending_spawns.empty())
+            return;
+
+        std::vector<PendingEnemySpawn> ready{};
+        ready.reserve(m_pending_spawns.size());
+
+        for (auto& pending : m_pending_spawns)
+        {
+            pending.delay_remaining -= delta_time;
+            if (pending.delay_remaining <= 0.0)
+                ready.push_back(pending);
+        }
+
+        if (ready.empty())
+            return;
+
+        m_pending_spawns.erase(
+            std::remove_if(m_pending_spawns.begin(), m_pending_spawns.end(),
+                           [](const PendingEnemySpawn& p) { return p.delay_remaining <= 0.0; }),
+            m_pending_spawns.end());
+
+        for (const PendingEnemySpawn& pending : ready)
+            this->finalize_enemy_spawn(pending);
+    }
+
+    void Level::update_fading_enemies(const double delta_time)
+    {
+        if (m_fading_enemies.empty())
+            return;
+
+        for (auto it = m_fading_enemies.begin(); it != m_fading_enemies.end();)
+        {
+            FadingEnemy& entry{ *it };
+            if (entry.enemy == nullptr || !entry.enemy->is_inside_tree())
+            {
+                it = m_fading_enemies.erase(it);
                 continue;
+            }
 
-            auto* controller{ memnew(EnemyController) };
-            controller->set_behavior(is_brute ? EnemyController::Behavior::BruteCharge
-                                              : EnemyController::Behavior::ScoutRanged);
-            enemy->set_controller(controller);
-            enemy->set_global_position(marker->get_global_position());
-            this->add_child(enemy);
+            entry.fade_remaining -= delta_time;
+            const float t{ godot::Math::clamp(
+                1.0f - static_cast<float>(entry.fade_remaining / spawn::fade_in_duration), 0.0f,
+                1.0f) };
+            entry.enemy->set_modulate(godot::Color(1.0f, 1.0f, 1.0f, t));
 
-            signal<event::died>::connect<Enemy>(enemy) <=> signal_callback(this, on_enemy_died);
-            signal<event::spawn_projectile>::connect<Enemy>(enemy) <=>
-                signal_callback(this, on_enemy_spawn_projectile);
-            ++m_enemy_count;
+            if (entry.fade_remaining <= 0.0)
+            {
+                entry.enemy->set_modulate(godot::Color(1.0f, 1.0f, 1.0f, 1.0f));
+                it = m_fading_enemies.erase(it);
+            }
+            else
+            {
+                ++it;
+            }
         }
     }
 
@@ -260,6 +340,9 @@ namespace rl
 
     void Level::clear_enemies()
     {
+        m_pending_spawns.clear();
+        m_fading_enemies.clear();
+
         for (int i = this->get_child_count() - 1; i >= 0; --i)
         {
             godot::Node* child{ this->get_child(i) };
@@ -359,6 +442,12 @@ namespace rl
         if (m_state == LevelState::Defeat || m_state == LevelState::Victory)
             this->handle_restart_input();
 
+        if (m_state == LevelState::Playing)
+        {
+            this->update_pending_spawns(delta_time);
+            this->update_fading_enemies(delta_time);
+        }
+
         this->queue_redraw();
     }
 
@@ -366,14 +455,46 @@ namespace rl
     {
         if (this->active() && m_state == LevelState::Playing) [[likely]]
         {
-            godot::Point2 mouse_pos{ this->get_global_mouse_position() };
-            this->draw_circle(mouse_pos, 5, { "DARK_CYAN" });
+            for (const PendingEnemySpawn& pending : m_pending_spawns)
+            {
+                const float progress{ godot::Math::clamp(
+                    1.0f - static_cast<float>(pending.delay_remaining / spawn::telegraph_duration),
+                    0.0f, 1.0f) };
+                const float alpha{ 0.25f + 0.55f * progress };
+                const godot::Color ring{ 0.95f, 0.78f, 0.35f, alpha };
+                const godot::Color fill{ 0.95f, 0.78f, 0.35f, alpha * 0.25f };
+                this->draw_circle(pending.position, spawn::telegraph_radius, fill);
+                this->draw_arc(pending.position, spawn::telegraph_radius, 0.0f, 6.2831855f, 32,
+                               ring, 2.5f, true);
+            }
+
+            // 攻击准星：暖金光点（环 + 亮心 + 四道光刺），呼应「光」主题。
+            const godot::Vector2 aim{ this->get_global_mouse_position() };
+            const godot::Color halo{ 0.98f, 0.90f, 0.60f, 0.85f };
+            const godot::Color core{ 1.0f, 0.98f, 0.85f, 1.0f };
+            this->draw_arc(aim, 10.0f, 0.0f, 6.2831855f, 28, halo, 1.8f, true);
+            this->draw_circle(aim, 2.4f, core);
+            constexpr float spike_in{ 5.0f };
+            constexpr float spike_out{ 9.0f };
+            this->draw_line(aim + godot::Vector2{ spike_in, 0.0f },
+                            aim + godot::Vector2{ spike_out, 0.0f }, halo, 1.6f, true);
+            this->draw_line(aim + godot::Vector2{ -spike_in, 0.0f },
+                            aim + godot::Vector2{ -spike_out, 0.0f }, halo, 1.6f, true);
+            this->draw_line(aim + godot::Vector2{ 0.0f, spike_in },
+                            aim + godot::Vector2{ 0.0f, spike_out }, halo, 1.6f, true);
+            this->draw_line(aim + godot::Vector2{ 0.0f, -spike_in },
+                            aim + godot::Vector2{ 0.0f, -spike_out }, halo, 1.6f, true);
         }
     }
 
     void Level::activate(bool active)
     {
         m_active = active;
+
+        // 鼠标离开游戏画面 → 暂停玩家输入（朝向 / 移动 / 射击），
+        // 避免鼠标在窗口外时小人仍跟随移动或转向。仅在游玩中联动。
+        if (m_state == LevelState::Playing)
+            this->set_player_input_enabled(active);
     }
 
     bool Level::active() const

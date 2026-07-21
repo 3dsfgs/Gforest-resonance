@@ -80,6 +80,32 @@ namespace rl::inline constants
 
         /** Day4–5：三房顺序；最后一房清怪才 Victory。 */
         constexpr inline int room_count{ 3 };
+
+        /** v0.4 P0-4：过场地名卡（情绪三幕）。 */
+        constexpr inline const char* room_display_names[room_count]{
+            "雾缘",
+            "深心",
+            "光扉",
+        };
+    }
+
+    namespace camera
+    {
+        /** P0-2：位置阻尼（Godot Camera2D position_smoothing_speed）。 */
+        constexpr inline float position_smoothing_speed{ 9.0f };
+        /** P0-2：朝鼠标方向的最大前瞻偏移（像素）。 */
+        constexpr inline float lookahead_max_offset{ 72.0f };
+        /** P0-2：前瞻 lerp 速度。 */
+        constexpr inline float lookahead_lerp_speed{ 10.0f };
+    }
+
+    namespace spawn
+    {
+        /** P0-3：预警圈持续时间（秒）。 */
+        constexpr inline double telegraph_duration{ 0.4 };
+        /** P0-3：敌人生成后淡入时长（秒）。 */
+        constexpr inline double fade_in_duration{ 0.25 };
+        constexpr inline float telegraph_radius{ 28.0f };
     }
 
     namespace atmosphere
@@ -231,6 +257,8 @@ namespace rl::inline constants
         constexpr inline auto room_cleared{ "room_cleared" };
         constexpr inline auto run_restart{ "run_restart" };
         constexpr inline auto run_victory{ "run_victory" };
+        /** P0-4：清房后请求过场，GDScript 播完再 advance_to_room。 */
+        constexpr inline auto room_advance_requested{ "room_advance_requested" };
         constexpr inline auto body_entered{ "body_entered" };
         constexpr inline auto body_exited{ "body_exited" };
         constexpr inline auto signal_example{ "custom_signal_example" };

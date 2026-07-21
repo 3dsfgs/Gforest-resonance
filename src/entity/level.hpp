@@ -5,8 +5,10 @@
 
 #include <godot_cpp/classes/node2d.hpp>
 #include <godot_cpp/classes/sprite2d.hpp>
+#include <godot_cpp/variant/vector2.hpp>
 
 #include "core/constants.hpp"
+#include "entity/character/enemy.hpp"
 #include "entity/character/player.hpp"
 #include "entity/controller/player_controller.hpp"
 #include "entity/projectile/projectile_spawner.hpp"
@@ -60,8 +62,23 @@ namespace rl
         [[signal_slot]] void on_enemy_died();
 
     private:
+        struct PendingEnemySpawn {
+            godot::Vector2 position{};
+            bool is_brute{ false };
+            double delay_remaining{ spawn::telegraph_duration };
+        };
+
+        struct FadingEnemy {
+            Enemy* enemy{ nullptr };
+            double fade_remaining{ spawn::fade_in_duration };
+        };
+
         void spawn_player_at_marker();
         void spawn_enemies_from_markers();
+        void queue_enemy_spawn(godot::Vector2 position, bool is_brute);
+        void finalize_enemy_spawn(const PendingEnemySpawn& pending);
+        void update_pending_spawns(double delta_time);
+        void update_fading_enemies(double delta_time);
         void spawn_projectile_from_marker(godot::Node* obj, bool from_enemy);
         void clear_enemies();
         void clear_projectiles();
@@ -80,5 +97,7 @@ namespace rl
         ProjectileSpawner* m_projectile_spawner{ memnew(rl::ProjectileSpawner) };
         Player* m_player{ nullptr };
         godot::RigidBody2D* m_physics_box{ nullptr };
+        std::vector<PendingEnemySpawn> m_pending_spawns{};
+        std::vector<FadingEnemy> m_fading_enemies{};
     };
 }

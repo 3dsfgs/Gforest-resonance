@@ -179,8 +179,8 @@ namespace rl::inline ui
 
         this->stop_narrative();
 
-        m_narrative_text = godot::String{ full_text.data() };
-        m_hint_text = godot::String{ hint.data() };
+        m_narrative_text = godot::String::utf8(full_text.data());
+        m_hint_text = godot::String::utf8(hint.data());
         m_line_lengths = build_line_lengths(m_narrative_text);
         m_line_start_index = 0;
         m_line_index = 0;
