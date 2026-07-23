@@ -68,6 +68,43 @@ namespace rl
         return m_room_index;
     }
 
+    void Level::set_room_kind(const RoomKind kind)
+    {
+        m_room_kind = kind;
+    }
+
+    void Level::set_is_final_room(const bool is_final)
+    {
+        m_is_final_room = is_final;
+    }
+
+    void Level::request_room_clear()
+    {
+        if (m_state != LevelState::Playing)
+            return;
+
+        if (m_room_kind != RoomKind::Whisper && m_room_kind != RoomKind::Mood)
+            return;
+
+        this->complete_room();
+    }
+
+    void Level::complete_room()
+    {
+        if (m_state != LevelState::Playing)
+            return;
+
+        this->set_player_input_enabled(false);
+
+        if (m_is_final_room)
+        {
+            this->transition_to_state(LevelState::Victory);
+            return;
+        }
+
+        this->emit_signal(event::room_cleared, m_room_index);
+    }
+
     int Level::get_player_hearts() const
     {
         if (m_player == nullptr)
@@ -95,7 +132,8 @@ namespace rl
         this->spawn_player_at_marker();
         this->add_child(m_projectile_spawner);
         birth_buff::apply_from_disk(m_player, m_projectile_spawner);
-        this->spawn_enemies_from_markers();
+        if (m_room_kind == RoomKind::Combat || m_room_kind == RoomKind::Boss)
+            this->spawn_enemies_from_markers();
         this->apply_room_camera_limits();
         this->apply_forest_atmosphere();
 
@@ -400,7 +438,8 @@ namespace rl
         }
 
         this->set_player_input_enabled(true);
-        this->spawn_enemies_from_markers();
+        if (m_room_kind == RoomKind::Combat || m_room_kind == RoomKind::Boss)
+            this->spawn_enemies_from_markers();
 
         this->emit_signal(event::level_state_changed, static_cast<int>(m_state));
 
@@ -509,6 +548,7 @@ namespace rl
         bind_member_function(Level, on_enemy_spawn_projectile);
         bind_member_function(Level, on_player_died);
         bind_member_function(Level, on_enemy_died);
+        bind_member_function(Level, request_room_clear);
         signal_binding<Level, event::level_state_changed>::add<int>();
         signal_binding<Level, event::room_cleared>::add<int>();
         signal_binding<Level, event::run_restart>::add<>();
@@ -583,14 +623,6 @@ namespace rl
         if (m_enemy_count > 0)
             return;
 
-        // Last room → Victory; earlier rooms → advance via room_cleared.
-        if (m_room_index >= level::room_count - 1)
-        {
-            this->transition_to_state(LevelState::Victory);
-            return;
-        }
-
-        this->set_player_input_enabled(false);
-        this->emit_signal(event::room_cleared, m_room_index);
+        this->complete_room();
     }
 }

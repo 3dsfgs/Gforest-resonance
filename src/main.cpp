@@ -1,6 +1,7 @@
 #include "core/assert.hpp"
 #include "core/constants.hpp"
 #include "main.hpp"
+#include "entity/level.hpp"
 #include "singletons/console.hpp"
 #include "ui/heart_hud.hpp"
 #include "util/bind.hpp"
@@ -12,6 +13,23 @@
 
 namespace rl
 {
+    namespace
+    {
+        void seed_legacy_run(std::vector<RunRoomEntry>& rooms)
+        {
+            rooms.clear();
+            for (int i = 0; i < level::room_count; ++i)
+            {
+                RunRoomEntry entry{};
+                entry.scene_path = godot::String{ path::scene::room_paths[i] };
+                entry.display_name = godot::String::utf8(level::room_display_names[i]);
+                entry.room_kind = i >= level::room_count - 1 ? "boss" : "combat";
+                entry.is_final = i >= level::room_count - 1;
+                rooms.push_back(entry);
+            }
+        }
+    }
+
     Main::Main()
     {
         resource::preload::packed_scene<MainDialog> dialog{ path::ui::MainDialog };
@@ -43,7 +61,48 @@ namespace rl
         if (m_active_level != nullptr)
             return;
 
+        if (m_run_rooms.empty())
+            seed_legacy_run(m_run_rooms);
+
         this->load_room(0);
+    }
+
+    void Main::configure_run(const godot::Array& rooms)
+    {
+        m_run_rooms.clear();
+
+        for (int i = 0; i < rooms.size(); ++i)
+        {
+            const godot::Variant& item{ rooms[i] };
+            if (item.get_type() != godot::Variant::DICTIONARY)
+                continue;
+
+            const godot::Dictionary dict{ item };
+            RunRoomEntry entry{};
+            entry.scene_path = dict.get("scene_path", godot::String{});
+            entry.display_name = dict.get("display_name", godot::String{});
+            entry.room_kind = dict.get("room_kind", godot::String{ "combat" });
+            entry.is_final = dict.get("is_final", false);
+
+            if (entry.scene_path.is_empty())
+                continue;
+
+            m_run_rooms.push_back(entry);
+        }
+
+        if (m_run_rooms.empty())
+            seed_legacy_run(m_run_rooms);
+    }
+
+    RoomKind Main::parse_room_kind(const godot::String& room_kind) const
+    {
+        if (room_kind == "whisper")
+            return RoomKind::Whisper;
+        if (room_kind == "mood")
+            return RoomKind::Mood;
+        if (room_kind == "boss")
+            return RoomKind::Boss;
+        return RoomKind::Combat;
     }
 
     void Main::advance_to_room(const int room_index, const int carry_hearts)
@@ -54,6 +113,7 @@ namespace rl
     void Main::return_to_title()
     {
         this->unload_active_level();
+        m_run_rooms.clear();
         input::show_cursor();
         console::get()->print("{}", io::green("return to title"));
     }
@@ -132,28 +192,31 @@ namespace rl
         if (m_game_viewport == nullptr)
             return;
 
-        if (room_index < 0 || room_index >= level::room_count)
+        if (room_index < 0 || room_index >= static_cast<int>(m_run_rooms.size()))
             return;
 
         const int previous_hearts{ carry_hearts };
+        const RunRoomEntry& room{ m_run_rooms[static_cast<std::size_t>(room_index)] };
 
         this->unload_active_level();
 
         m_room_index = room_index;
-        resource::preload::packed_scene<Level> level_scene{
-            path::scene::room_paths[room_index] };
+        resource::preload::packed_scene<Level> level_scene{ room.scene_path };
         m_active_level = level_scene.instantiate();
         runtime_assert(m_active_level != nullptr);
 
         m_active_level->set_room_index(room_index);
+        m_active_level->set_room_kind(this->parse_room_kind(room.room_kind));
+        m_active_level->set_is_final_room(room.is_final);
         m_game_viewport->add_child(m_active_level);
         this->bind_active_level_signals();
 
         if (previous_hearts > 0)
             m_active_level->apply_player_hearts(previous_hearts);
 
-        console::get()->print("{} {}", io::green("enter room"),
-                              io::blue(std::to_string(room_index + 1)));
+        console::get()->print("{} {} ({})", io::green("enter room"),
+                              io::blue(std::to_string(room_index + 1)),
+                              io::yellow(room.room_kind.utf8().get_data()));
     }
 
     [[signal_slot]]
@@ -165,13 +228,15 @@ namespace rl
         const int hearts{ m_active_level->get_player_hearts() };
         const int next_index{ room_index + 1 };
 
-        if (next_index < 0 || next_index >= level::room_count)
+        if (next_index < 0 || next_index >= static_cast<int>(m_run_rooms.size()))
             return;
+
+        const godot::String display_name{ m_run_rooms[static_cast<std::size_t>(next_index)]
+                                              .display_name };
 
         console::get()->print("{} {}", io::green("room cleared"),
                               io::blue(std::to_string(room_index + 1)));
-        this->emit_signal(event::room_advance_requested, next_index, hearts,
-                          godot::String::utf8(level::room_display_names[next_index]));
+        this->emit_signal(event::room_advance_requested, next_index, hearts, display_name);
     }
 
     [[signal_slot]]

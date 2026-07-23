@@ -19,6 +19,13 @@ func _ready() -> void:
 		MusicDirector.play_title()
 
 
+## 不可 override C++ Main.begin_run()；用此入口开战并注入梦房链。
+func start_dream_run() -> void:
+	if DreamRoomChain:
+		configure_run(DreamRoomChain.build_run_config())
+	begin_run()
+
+
 func _on_room_advance_requested(next_index: int, hearts: int, room_name: String) -> void:
 	if has_node("RoomTransition"):
 		return

@@ -1,8 +1,12 @@
 #pragma once
 
+#include <vector>
+
 #include <godot_cpp/classes/canvas_layer.hpp>
 #include <godot_cpp/classes/node.hpp>
 #include <godot_cpp/classes/sub_viewport.hpp>
+#include <godot_cpp/variant/array.hpp>
+#include <godot_cpp/variant/string.hpp>
 
 #include "entity/level.hpp"
 #include "ui/main_dialog.hpp"
@@ -10,6 +14,13 @@
 
 namespace rl
 {
+    struct RunRoomEntry {
+        godot::String scene_path{};
+        godot::String display_name{};
+        godot::String room_kind{};
+        bool is_final{ false };
+    };
+
     class Main : public godot::Node
     {
         GDCLASS(Main, godot::Node);
@@ -23,6 +34,8 @@ namespace rl
 
         /** Called by birthday UI after profile.json is written. */
         void begin_run();
+        /** P2-6：GDScript 在 begin_run 前注入当晚梦房链。 */
+        void configure_run(const godot::Array& rooms);
         /** P0-4：GDScript 过场播完后加载下一房。 */
         void advance_to_room(int room_index, int carry_hearts);
         /** Day12：卸下关卡，回到标题前调用。 */
@@ -37,6 +50,7 @@ namespace rl
             bind_member_function(Main, on_run_restart);
             bind_member_function(Main, on_level_state_changed);
             bind_member_function(Main, begin_run);
+            bind_member_function(Main, configure_run);
             bind_member_function(Main, advance_to_room);
             bind_member_function(Main, return_to_title);
             signal_binding<Main, event::signal_example>::add<double>();
@@ -52,9 +66,11 @@ namespace rl
         void load_room(int room_index, int carry_hearts = -1);
         void bind_active_level_signals();
         void unload_active_level();
+        [[nodiscard]] RoomKind parse_room_kind(const godot::String& room_kind) const;
 
         double m_signal_timer{ 0.0 };
         int m_room_index{ 0 };
+        std::vector<RunRoomEntry> m_run_rooms{};
         godot::CanvasLayer* m_canvas_layer{ nullptr };
         godot::SubViewport* m_game_viewport{ nullptr };
         MainDialog* m_main_dialog{ nullptr };

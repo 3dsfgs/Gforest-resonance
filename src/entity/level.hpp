@@ -30,6 +30,14 @@ namespace rl
         Defeat
     };
 
+    /** P2-6：梦房链房型。 */
+    enum class RoomKind {
+        Combat,
+        Whisper,
+        Mood,
+        Boss
+    };
+
     class Level : public godot::Node2D
     {
         GDCLASS(Level, godot::Node2D);
@@ -48,6 +56,10 @@ namespace rl
         [[nodiscard]] LevelState get_state() const;
         void set_room_index(int room_index);
         [[nodiscard]] int get_room_index() const;
+        void set_room_kind(RoomKind kind);
+        void set_is_final_room(bool is_final);
+        /** P2-6：低语/心境房由 GDScript 调用以推进链条。 */
+        void request_room_clear();
         [[nodiscard]] int get_player_hearts() const;
         void apply_player_hearts(int hearts);
 
@@ -88,11 +100,14 @@ namespace rl
         void handle_restart_input();
         void apply_room_camera_limits();
         void apply_forest_atmosphere();
+        void complete_room();
 
         std::atomic<bool> m_active{ false };
         LevelState m_state{ LevelState::Playing };
         int m_enemy_count{ 0 };
         int m_room_index{ 0 };
+        RoomKind m_room_kind{ RoomKind::Combat };
+        bool m_is_final_room{ false };
         godot::Node* m_background{ nullptr };
         ProjectileSpawner* m_projectile_spawner{ memnew(rl::ProjectileSpawner) };
         Player* m_player{ nullptr };
