@@ -97,7 +97,7 @@ namespace rl::birth_buff
             spawner->set_fire_rate(fire_rate);
         }
 
-        console::get()->print("{} {} · {}", io::green("命格"),
+        console::get()->print("{} {} · {}", io::green("性情底色"),
                               io::yellow(profile.title.utf8().get_data()),
                               io::blue(profile.buff_summary.utf8().get_data()));
     }
