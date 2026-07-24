@@ -23,6 +23,9 @@ func _ready() -> void:
 func start_dream_run() -> void:
 	if DreamRoomChain:
 		configure_run(DreamRoomChain.build_run_config())
+	if MusicDirector:
+		# 首房固定战斗；后续由 room_transition 按房型切轨。
+		MusicDirector.play_for_room_kind("combat")
 	begin_run()
 
 

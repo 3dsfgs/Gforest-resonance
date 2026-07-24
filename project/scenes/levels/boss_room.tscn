@@ -173,8 +173,5 @@ position = Vector2(-360, -40)
 [node name="EnemySpawn2" type="Marker2D" parent="."]
 position = Vector2(360, -40)
 
-[node name="EnemyBruteSpawn1" type="Marker2D" parent="."]
-position = Vector2(0, -300)
-
-[node name="EnemyBruteSpawn2" type="Marker2D" parent="."]
-position = Vector2(0, -520)
+[node name="EnemyBossSpawnW2_1" type="Marker2D" parent="."]
+position = Vector2(0, -280)

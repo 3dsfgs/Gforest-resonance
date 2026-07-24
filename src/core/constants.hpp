@@ -16,6 +16,7 @@ namespace rl::inline constants
         constexpr inline auto spawn_point{ "SpawnPoint" };
         constexpr inline auto enemy_spawn_prefix{ "EnemySpawn" };
         constexpr inline auto enemy_brute_spawn_prefix{ "EnemyBruteSpawn" };
+        constexpr inline auto enemy_boss_spawn_prefix{ "EnemyBossSpawn" };
         constexpr inline auto enemy_spawn1{ "EnemySpawn1" };
         constexpr inline auto damage_zone{ "DamageZone" };
         constexpr inline auto death_pit{ "DeathPit" };
@@ -41,6 +42,7 @@ namespace rl::inline constants
             constexpr inline auto player{ "Player" };
             constexpr inline auto enemy{ "Enemy" };
             constexpr inline auto enemy_brute{ "EnemyBrute" };
+            constexpr inline auto enemy_boss{ "EnemyBoss" };
             constexpr inline auto firing_pt{ "FiringPoint" };
             constexpr inline auto sprite{ "PlayerSprite" };
         }
@@ -106,6 +108,8 @@ namespace rl::inline constants
         /** P0-3：敌人生成后淡入时长（秒）。 */
         constexpr inline double fade_in_duration{ 0.25 };
         constexpr inline float telegraph_radius{ 28.0f };
+        /** P2-3：波次间喘息（秒），清波后稍停再刷下一波。 */
+        constexpr inline double wave_breath_duration{ 1.15 };
     }
 
     namespace atmosphere
@@ -170,6 +174,22 @@ namespace rl::inline constants
         constexpr inline int enemy_brute_hearts{ 5 };
         /** Day6 慢而肉追击速度。 */
         constexpr inline double enemy_brute_movement_speed{ 200.0 };
+        /** P2-4 心魔 Boss：高血量 + 中速环绕。 */
+        constexpr inline int enemy_boss_hearts{ 12 };
+        constexpr inline double enemy_boss_movement_speed{ 260.0 };
+        constexpr inline float enemy_boss_orbit_range{ 340.0f };
+        constexpr inline float enemy_boss_orbit_band{ 70.0f };
+        constexpr inline float enemy_boss_ranged_range{ 580.0f };
+        constexpr inline float enemy_boss_ranged_min_range{ 160.0f };
+        constexpr inline double enemy_boss_fire_rate{ 0.9 };
+        /** 特殊攻击「心影爆发」：扇形连射。 */
+        constexpr inline double enemy_boss_special_cooldown{ 3.0 };
+        constexpr inline int enemy_boss_burst_count{ 5 };
+        constexpr inline double enemy_boss_burst_spread{ 0.38 };
+        /** 半血以下冲撞更频繁；冲撞全程可用。 */
+        constexpr inline float enemy_boss_phase2_ratio{ 0.5f };
+        constexpr inline double enemy_boss_charge_cooldown{ 2.8 };
+        constexpr inline double enemy_boss_charge_cooldown_phase2{ 1.5 };
         /** Day6 坦克冲撞：触发距离 / 冲刺速度倍率 / 持续时间 / 冷却。 */
         constexpr inline float enemy_charge_trigger_range{ 320.0f };
         constexpr inline float enemy_charge_speed_mult{ 3.2f };
@@ -230,6 +250,8 @@ namespace rl::inline constants
         constexpr inline float sfx_player_hurt_volume_db{ 0.0f };
         /** Day7–8 冲刺音效。 */
         constexpr inline float sfx_player_dash_volume_db{ -2.0f };
+        /** P2-5 武器开火。 */
+        constexpr inline float sfx_weapon_shot_volume_db{ -6.0f };
 
         /**
          * Day7–8 冲刺/闪避：距离 ≈ move_speed * dash_speed_mult * dash_duration
@@ -335,6 +357,8 @@ namespace rl::inline constants
             constexpr inline auto Enemy{ "res://scenes/characters/enemy.tscn" };
             /** Day6：慢而肉变体。 */
             constexpr inline auto EnemyBrute{ "res://scenes/characters/enemy_brute.tscn" };
+            /** P2-4：心魔 Boss。 */
+            constexpr inline auto EnemyBoss{ "res://scenes/characters/enemy_boss.tscn" };
 
             constexpr inline const char* room_paths[level::room_count]{
                 Level1,
@@ -360,6 +384,7 @@ namespace rl::inline constants
         namespace data
         {
             constexpr inline auto buff_rules{ "res://data/buff_rules.json" };
+            constexpr inline auto weapon_rules{ "res://data/weapon_rules.json" };
         }
 
         namespace shader
@@ -384,13 +409,19 @@ namespace rl::inline constants
             constexpr inline auto player_hurt{ "res://assets/audio/sfx/retro/hurt2.ogg" };
             /** Kenney retro pack — dash whoosh 占位（可换成专用冲刺音）。 */
             constexpr inline auto player_dash{ "res://assets/audio/sfx/retro/laser1.ogg" };
+            /** P2-5 武器开火占位（与 weapon_rules.json 对齐）。 */
+            constexpr inline auto weapon_pulse{ "res://assets/audio/sfx/sci_fi/lasersmall_000.ogg" };
+            constexpr inline auto weapon_pistol{ "res://assets/audio/sfx/sci_fi/laserretro_001.ogg" };
+            constexpr inline auto weapon_shotgun{ "res://assets/audio/sfx/sci_fi/laserlarge_000.ogg" };
         }
 
         namespace music
         {
             /** Day11–12 分场景 BGM（Kenney loops 占位，可整段替换）。 */
             constexpr inline auto title{ "res://assets/audio/music/loops/flowing_rocks.ogg" };
+            constexpr inline auto explore{ "res://assets/audio/music/loops/space_cadet.ogg" };
             constexpr inline auto combat{ "res://assets/audio/music/loops/mission_plausible.ogg" };
+            constexpr inline auto boss{ "res://assets/audio/music/loops/infinite_descent.ogg" };
             constexpr inline auto ending{ "res://assets/audio/music/loops/night_at-the-beach.ogg" };
         }
 

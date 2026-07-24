@@ -38,6 +38,9 @@ namespace rl
         void configure_run(const godot::Array& rooms);
         /** P0-4：GDScript 过场播完后加载下一房。 */
         void advance_to_room(int room_index, int carry_hearts);
+        /** P2-1：心境房唤醒武器后写入，跨房保留。 */
+        void set_run_weapon(const godot::String& weapon_id);
+        [[nodiscard]] godot::String get_run_weapon() const;
         /** Day12：卸下关卡，回到标题前调用。 */
         void return_to_title();
 
@@ -52,6 +55,8 @@ namespace rl
             bind_member_function(Main, begin_run);
             bind_member_function(Main, configure_run);
             bind_member_function(Main, advance_to_room);
+            bind_member_function(Main, set_run_weapon);
+            bind_member_function(Main, get_run_weapon);
             bind_member_function(Main, return_to_title);
             signal_binding<Main, event::signal_example>::add<double>();
             signal_binding<Main, event::run_victory>::add<>();
@@ -70,6 +75,7 @@ namespace rl
 
         double m_signal_timer{ 0.0 };
         int m_room_index{ 0 };
+        godot::String m_weapon_id{ "pulse" };
         std::vector<RunRoomEntry> m_run_rooms{};
         godot::CanvasLayer* m_canvas_layer{ nullptr };
         godot::SubViewport* m_game_viewport{ nullptr };

@@ -18,10 +18,10 @@ namespace rl::combat_feedback
     {
         constexpr const char* kill_anim_name{ "kill" };
 
-        godot::Ref<godot::AudioStream> load_audio(const char* resource_path)
+        godot::Ref<godot::AudioStream> load_audio(const godot::String& resource_path)
         {
             godot::ResourceLoader* loader{ godot::ResourceLoader::get_singleton() };
-            if (loader == nullptr || !loader->exists(resource_path))
+            if (loader == nullptr || resource_path.is_empty() || !loader->exists(resource_path))
                 return {};
 
             return loader->load(resource_path);
@@ -104,6 +104,15 @@ namespace rl::combat_feedback
     {
         godot::Ref<godot::AudioStream> stream{ load_audio(path::audio::player_dash) };
         play_one_shot(scene_parent, world_position, stream, combat::sfx_player_dash_volume_db);
+    }
+
+    void play_weapon_shot(godot::Node* scene_parent, godot::Vector2 world_position,
+                          const godot::String& sfx_path)
+    {
+        if (sfx_path.is_empty())
+            return;
+        godot::Ref<godot::AudioStream> stream{ load_audio(sfx_path) };
+        play_one_shot(scene_parent, world_position, stream, combat::sfx_weapon_shot_volume_db);
     }
 
     void spawn_kill_explosion(godot::Node* scene_parent, godot::Vector2 world_position)

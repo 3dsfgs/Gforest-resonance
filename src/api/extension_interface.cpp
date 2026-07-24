@@ -9,6 +9,7 @@
 #include "entity/camera.hpp"
 #include "entity/character/character.hpp"
 #include "entity/character/enemy.hpp"
+#include "entity/character/enemy_boss.hpp"
 #include "entity/character/enemy_brute.hpp"
 #include "entity/character/player.hpp"
 #include "entity/controller/character_controller.hpp"
@@ -66,6 +67,7 @@ namespace rl
         godot::ClassDB::register_class<rl::Character>();
         godot::ClassDB::register_class<rl::Enemy>();
         godot::ClassDB::register_class<rl::EnemyBrute>();
+        godot::ClassDB::register_class<rl::EnemyBoss>();
         godot::ClassDB::register_class<rl::Player>();
 
         godot::ClassDB::register_class<rl::Level>();

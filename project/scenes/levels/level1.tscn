@@ -134,3 +134,9 @@ occluder = SubResource("OccluderPolygon2D_d0buj")
 
 [node name="EnemySpawn1" type="Marker2D" parent="." unique_id=2047486174]
 position = Vector2(0, 220)
+
+[node name="EnemySpawnW2_1" type="Marker2D" parent="."]
+position = Vector2(-280, -120)
+
+[node name="EnemySpawnW2_2" type="Marker2D" parent="."]
+position = Vector2(280, -120)

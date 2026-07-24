@@ -44,6 +44,8 @@ namespace rl
 
         /** Scout ranged: collide with Player; do not damage allied enemies. */
         void configure_as_enemy_shot();
+        void set_damage_hearts(int hearts);
+        [[nodiscard]] int get_damage_hearts() const;
 
     protected:
         static void _bind_methods()
@@ -75,6 +77,7 @@ namespace rl
         bool m_flight_speed_captured{ false };
         bool m_hostile_to_player{ false };
         int m_wall_bounce_count{ 0 };
+        int m_damage_hearts{ combat::projectile_damage_hearts };
         /** Captured flight speed after launch; restored after wall bounce. */
         double m_flight_speed{ 0.0 };
         // projectile movement velocity / impulse (pixels)

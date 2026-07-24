@@ -23,9 +23,21 @@ namespace rl
         ~ProjectileSpawner() = default;
 
         Projectile* spawn_projectile();
+        /** Consume fire-rate cooldown; returns false if still cooling down. */
+        bool try_begin_shot();
+        /** Always instantiate a configured projectile (no cooldown). */
+        Projectile* create_projectile();
 
         double get_fire_rate() const;
         void set_fire_rate(double fire_rate);
+        double get_spread_radians() const;
+        void set_spread_radians(double spread);
+        int get_pellet_count() const;
+        void set_pellet_count(int count);
+        int get_damage_hearts() const;
+        void set_damage_hearts(int hearts);
+        double get_impulse() const;
+        void set_impulse(double impulse);
 
     protected:
         static void _bind_methods();
@@ -38,6 +50,10 @@ namespace rl
     private:
         // number of projectiles per second
         double m_fire_rate{ combat::projectile_fire_rate };
+        double m_spread_radians{ combat::projectile_spread_radians };
+        double m_impulse{ combat::projectile_impulse };
+        int m_pellet_count{ 1 };
+        int m_damage_hearts{ combat::projectile_damage_hearts };
         // time delay between shots (ms). multiplication by 100 is just to offset rounding errors.
         millisec_t m_spawn_delay{ ProjectileSpawner::calculate_spawn_delay(m_fire_rate) };
         // the time point that keeps track of when the last projectile was spawned.

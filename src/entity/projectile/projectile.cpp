@@ -85,6 +85,16 @@ namespace rl
                                   static_cast<uint32_t>(LayerID::Player));
     }
 
+    void Projectile::set_damage_hearts(const int hearts)
+    {
+        m_damage_hearts = hearts < 1 ? 1 : hearts;
+    }
+
+    int Projectile::get_damage_hearts() const
+    {
+        return m_damage_hearts;
+    }
+
     [[signal_slot]]
     void Projectile::on_body_entered(godot::Node* body)
     {
@@ -95,7 +105,7 @@ namespace rl
         {
             if (Player* player{ godot::Object::cast_to<Player>(body) })
             {
-                if (player->take_damage(combat::projectile_damage_hearts))
+                if (player->take_damage(m_damage_hearts))
                 {
                     console::get()->print("{} {}", io::red("enemy shot"),
                                           io::yellow("-1 heart"));
@@ -111,7 +121,7 @@ namespace rl
         }
         else if (Enemy* enemy{ godot::Object::cast_to<Enemy>(body) })
         {
-            if (enemy->take_damage(combat::projectile_damage_hearts))
+            if (enemy->take_damage(m_damage_hearts))
             {
                 combat_feedback::play_enemy_hit(this->get_parent(),
                                                 enemy->get_global_position());

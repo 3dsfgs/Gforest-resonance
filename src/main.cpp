@@ -64,7 +64,20 @@ namespace rl
         if (m_run_rooms.empty())
             seed_legacy_run(m_run_rooms);
 
+        m_weapon_id = "pulse";
         this->load_room(0);
+    }
+
+    void Main::set_run_weapon(const godot::String& weapon_id)
+    {
+        m_weapon_id = weapon_id.is_empty() ? godot::String{ "pulse" } : weapon_id;
+        if (m_active_level != nullptr)
+            m_active_level->apply_player_weapon(m_weapon_id);
+    }
+
+    godot::String Main::get_run_weapon() const
+    {
+        return m_weapon_id;
     }
 
     void Main::configure_run(const godot::Array& rooms)
@@ -114,6 +127,7 @@ namespace rl
     {
         this->unload_active_level();
         m_run_rooms.clear();
+        m_weapon_id = "pulse";
         input::show_cursor();
         console::get()->print("{}", io::green("return to title"));
     }
@@ -208,6 +222,7 @@ namespace rl
         m_active_level->set_room_index(room_index);
         m_active_level->set_room_kind(this->parse_room_kind(room.room_kind));
         m_active_level->set_is_final_room(room.is_final);
+        m_active_level->set_weapon_id(m_weapon_id);
         m_game_viewport->add_child(m_active_level);
         this->bind_active_level_signals();
 
@@ -226,6 +241,7 @@ namespace rl
             return;
 
         const int hearts{ m_active_level->get_player_hearts() };
+        m_weapon_id = m_active_level->get_player_weapon();
         const int next_index{ room_index + 1 };
 
         if (next_index < 0 || next_index >= static_cast<int>(m_run_rooms.size()))

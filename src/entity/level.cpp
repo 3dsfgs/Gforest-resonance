@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <map>
 #include <tuple>
 #include <godot_cpp/classes/camera2d.hpp>
 #include <godot_cpp/classes/collision_polygon2d.hpp>
@@ -18,6 +19,7 @@
 #include "core/constants.hpp"
 #include "entity/character/character.hpp"
 #include "entity/character/enemy.hpp"
+#include "entity/character/enemy_boss.hpp"
 #include "entity/character/enemy_brute.hpp"
 #include "entity/controller/enemy_controller.hpp"
 #include "entity/controller/player_controller.hpp"
@@ -26,11 +28,13 @@
 #include "singletons/console.hpp"
 #include "util/birth_buff.hpp"
 #include "util/bind.hpp"
+#include "util/combat_feedback.hpp"
 #include "util/conversions.hpp"
 #include "util/debug.hpp"
 #include "util/engine.hpp"
 #include "util/input.hpp"
 #include "util/io.hpp"
+#include "util/weapon_rules.hpp"
 
 namespace rl
 {
@@ -119,6 +123,25 @@ namespace rl
         m_player->apply_hearts(hearts);
     }
 
+    void Level::set_weapon_id(const godot::String& weapon_id)
+    {
+        m_weapon_id = weapon_id.is_empty() ? godot::String{ "pulse" } : weapon_id;
+    }
+
+    void Level::apply_player_weapon(const godot::String& weapon_id)
+    {
+        const weapon_rules::WeaponDef weapon{ weapon_rules::get(weapon_id) };
+        m_weapon_id = weapon.id;
+        weapon_rules::apply_to_spawner(m_projectile_spawner, weapon, m_fire_rate_mult);
+        console::get()->print("{} {}", io::green("weapon"),
+                              io::blue(m_weapon_id.utf8().get_data()));
+    }
+
+    godot::String Level::get_player_weapon() const
+    {
+        return m_weapon_id;
+    }
+
     void Level::_ready()
     {
         godot::Node* box{ this->find_child(name::level::physics_box, true, false) };
@@ -131,7 +154,12 @@ namespace rl
         this->add_child(m_player);
         this->spawn_player_at_marker();
         this->add_child(m_projectile_spawner);
-        birth_buff::apply_from_disk(m_player, m_projectile_spawner);
+
+        const birth_buff::Profile profile{ birth_buff::load_profile() };
+        m_fire_rate_mult = profile.valid ? profile.fire_rate_mult : 1.0;
+        birth_buff::apply(m_player, m_projectile_spawner, profile);
+        this->apply_player_weapon(m_weapon_id);
+
         if (m_room_kind == RoomKind::Combat || m_room_kind == RoomKind::Boss)
             this->spawn_enemies_from_markers();
         this->apply_room_camera_limits();
@@ -168,7 +196,34 @@ namespace rl
 
     void Level::spawn_enemies_from_markers()
     {
-        m_pending_spawns.clear();
+        this->collect_wave_markers();
+        m_current_wave = 0;
+        m_wave_breath_remaining = -1.0;
+
+        if (m_waves.empty())
+        {
+            console::get()->print("{} {}", io::orange("waves"),
+                                  io::yellow("no enemy markers"));
+            return;
+        }
+
+        this->start_wave(0);
+    }
+
+    int Level::parse_wave_index(const godot::String& marker_name)
+    {
+        // EnemySpawnW2_1 / EnemyBruteSpawnW3A → 波次；无 W# 后缀则第 1 波。
+        if (marker_name.contains("W3"))
+            return 3;
+        if (marker_name.contains("W2"))
+            return 2;
+        return 1;
+    }
+
+    void Level::collect_wave_markers()
+    {
+        m_waves.clear();
+        std::map<int, std::vector<WaveSpawnPoint>> by_wave;
 
         const int child_count{ this->get_child_count() };
         for (int i = 0; i < child_count; ++i)
@@ -178,24 +233,92 @@ namespace rl
                 continue;
 
             const godot::String child_name{ child->get_name() };
-            const bool is_brute{ child_name.begins_with(name::level::enemy_brute_spawn_prefix) };
-            const bool is_scout{ child_name.begins_with(name::level::enemy_spawn_prefix) };
-            if (!is_brute && !is_scout)
+            EnemySpawnKind kind{ EnemySpawnKind::Scout };
+            if (child_name.begins_with(name::level::enemy_boss_spawn_prefix))
+                kind = EnemySpawnKind::Boss;
+            else if (child_name.begins_with(name::level::enemy_brute_spawn_prefix))
+                kind = EnemySpawnKind::Brute;
+            else if (child_name.begins_with(name::level::enemy_spawn_prefix))
+                kind = EnemySpawnKind::Scout;
+            else
                 continue;
 
             godot::Marker2D* marker{ try_gdcast<godot::Marker2D>(child) };
             if (marker == nullptr)
                 continue;
 
-            this->queue_enemy_spawn(marker->get_position(), is_brute);
+            WaveSpawnPoint point{};
+            point.position = marker->get_position();
+            point.kind = kind;
+            by_wave[parse_wave_index(child_name)].push_back(point);
+        }
+
+        m_waves.reserve(by_wave.size());
+        for (auto& [wave_num, points] : by_wave)
+        {
+            (void)wave_num;
+            m_waves.push_back(std::move(points));
         }
     }
 
-    void Level::queue_enemy_spawn(const godot::Vector2 position, const bool is_brute)
+    void Level::start_wave(const int wave_index)
+    {
+        if (wave_index < 0 || wave_index >= static_cast<int>(m_waves.size()))
+            return;
+
+        m_current_wave = wave_index;
+        m_wave_breath_remaining = -1.0;
+        m_pending_spawns.clear();
+
+        for (const WaveSpawnPoint& point : m_waves[static_cast<std::size_t>(wave_index)])
+            this->queue_enemy_spawn(point.position, point.kind);
+
+        console::get()->print("{} {}/{}", io::green("wave"),
+                              io::blue(std::to_string(wave_index + 1)),
+                              io::blue(std::to_string(m_waves.size())));
+    }
+
+    void Level::try_finish_current_wave()
+    {
+        if (m_state != LevelState::Playing)
+            return;
+
+        if (m_enemy_count > 0 || !m_pending_spawns.empty())
+            return;
+
+        // 波间喘息中：等计时结束再开下一波。
+        if (m_wave_breath_remaining >= 0.0)
+            return;
+
+        const int next_wave{ m_current_wave + 1 };
+        if (next_wave < static_cast<int>(m_waves.size()))
+        {
+            m_wave_breath_remaining = spawn::wave_breath_duration;
+            console::get()->print("{} {}", io::green("wave clear"), io::yellow("breath"));
+            return;
+        }
+
+        this->complete_room();
+    }
+
+    void Level::update_wave_breath(const double delta_time)
+    {
+        if (m_wave_breath_remaining < 0.0)
+            return;
+
+        m_wave_breath_remaining -= delta_time;
+        if (m_wave_breath_remaining > 0.0)
+            return;
+
+        m_wave_breath_remaining = -1.0;
+        this->start_wave(m_current_wave + 1);
+    }
+
+    void Level::queue_enemy_spawn(const godot::Vector2 position, const EnemySpawnKind kind)
     {
         PendingEnemySpawn entry{};
         entry.position = position;
-        entry.is_brute = is_brute;
+        entry.kind = kind;
         entry.delay_remaining = spawn::telegraph_duration;
         m_pending_spawns.push_back(entry);
         this->queue_redraw();
@@ -205,15 +328,31 @@ namespace rl
     {
         resource::preload::packed_scene<Enemy> enemy_scene{ path::scene::Enemy };
         resource::preload::packed_scene<EnemyBrute> brute_scene{ path::scene::EnemyBrute };
+        resource::preload::packed_scene<EnemyBoss> boss_scene{ path::scene::EnemyBoss };
 
-        Enemy* enemy{ pending.is_brute ? static_cast<Enemy*>(brute_scene.instantiate())
-                                     : enemy_scene.instantiate() };
+        Enemy* enemy{ nullptr };
+        EnemyController::Behavior behavior{ EnemyController::Behavior::ScoutRanged };
+        switch (pending.kind)
+        {
+            case EnemySpawnKind::Boss:
+                enemy = static_cast<Enemy*>(boss_scene.instantiate());
+                behavior = EnemyController::Behavior::HeartDemon;
+                break;
+            case EnemySpawnKind::Brute:
+                enemy = static_cast<Enemy*>(brute_scene.instantiate());
+                behavior = EnemyController::Behavior::BruteCharge;
+                break;
+            case EnemySpawnKind::Scout:
+            default:
+                enemy = enemy_scene.instantiate();
+                behavior = EnemyController::Behavior::ScoutRanged;
+                break;
+        }
         if (enemy == nullptr)
             return;
 
         auto* controller{ memnew(EnemyController) };
-        controller->set_behavior(pending.is_brute ? EnemyController::Behavior::BruteCharge
-                                                  : EnemyController::Behavior::ScoutRanged);
+        controller->set_behavior(behavior);
         enemy->set_controller(controller);
         enemy->set_position(pending.position);
         enemy->set_modulate(godot::Color(1.0f, 1.0f, 1.0f, 0.0f));
@@ -380,6 +519,7 @@ namespace rl
     {
         m_pending_spawns.clear();
         m_fading_enemies.clear();
+        m_wave_breath_remaining = -1.0;
 
         for (int i = this->get_child_count() - 1; i >= 0; --i)
         {
@@ -430,6 +570,8 @@ namespace rl
 
         m_state = LevelState::Playing;
         m_enemy_count = 0;
+        m_current_wave = 0;
+        m_wave_breath_remaining = -1.0;
 
         if (m_player != nullptr)
         {
@@ -485,6 +627,7 @@ namespace rl
         {
             this->update_pending_spawns(delta_time);
             this->update_fading_enemies(delta_time);
+            this->update_wave_breath(delta_time);
         }
 
         this->queue_redraw();
@@ -500,11 +643,15 @@ namespace rl
                     1.0f - static_cast<float>(pending.delay_remaining / spawn::telegraph_duration),
                     0.0f, 1.0f) };
                 const float alpha{ 0.25f + 0.55f * progress };
-                const godot::Color ring{ 0.95f, 0.78f, 0.35f, alpha };
-                const godot::Color fill{ 0.95f, 0.78f, 0.35f, alpha * 0.25f };
-                this->draw_circle(pending.position, spawn::telegraph_radius, fill);
-                this->draw_arc(pending.position, spawn::telegraph_radius, 0.0f, 6.2831855f, 32,
-                               ring, 2.5f, true);
+                const bool is_boss{ pending.kind == EnemySpawnKind::Boss };
+                const godot::Color ring{ is_boss ? godot::Color(0.72f, 0.42f, 1.0f, alpha)
+                                                 : godot::Color(0.95f, 0.78f, 0.35f, alpha) };
+                const godot::Color fill{ ring.r, ring.g, ring.b, alpha * 0.25f };
+                const float radius{ is_boss ? spawn::telegraph_radius * 1.55f
+                                            : spawn::telegraph_radius };
+                this->draw_circle(pending.position, radius, fill);
+                this->draw_arc(pending.position, radius, 0.0f, 6.2831855f, 32, ring,
+                               is_boss ? 3.4f : 2.5f, true);
             }
 
             // 攻击准星：暖金光点（环 + 亮心 + 四道光刺），呼应「光」主题。
@@ -549,6 +696,8 @@ namespace rl
         bind_member_function(Level, on_player_died);
         bind_member_function(Level, on_enemy_died);
         bind_member_function(Level, request_room_clear);
+        bind_member_function(Level, apply_player_weapon);
+        bind_member_function(Level, get_player_weapon);
         signal_binding<Level, event::level_state_changed>::add<int>();
         signal_binding<Level, event::room_cleared>::add<int>();
         signal_binding<Level, event::run_restart>::add<>();
@@ -571,25 +720,64 @@ namespace rl
         if (m_state != LevelState::Playing)
             return;
 
-        Projectile* projectile{ m_projectile_spawner->spawn_projectile() };
-        if (projectile == nullptr)
+        godot::Marker2D* firing_pt{ try_gdcast<godot::Marker2D>(obj) };
+        if (firing_pt == nullptr)
             return;
 
         if (from_enemy)
-            projectile->configure_as_enemy_shot();
-
-        godot::Marker2D* firing_pt{ try_gdcast<godot::Marker2D>(obj) };
-        if (firing_pt != nullptr)
         {
-            const double spread{ from_enemy ? combat::projectile_spread_radians * 2.0
-                                            : combat::projectile_spread_radians };
+            // 敌弹不走玩家射速闸门；否则同帧连射（Boss 心影爆发）只剩 1 发。
+            Projectile* projectile{ m_projectile_spawner->create_projectile() };
+            if (projectile == nullptr)
+                return;
+
+            projectile->configure_as_enemy_shot();
+            const double spread{ combat::projectile_spread_radians * 2.0 };
             const double yaw_jitter{
                 spread > 0.0 ? godot::UtilityFunctions::randf_range(-spread, spread) : 0.0
             };
             projectile->set_position(firing_pt->get_global_position());
             projectile->set_rotation(firing_pt->get_global_rotation() + yaw_jitter);
+            this->add_child(projectile);
+            return;
         }
-        this->add_child(projectile);
+
+        // 玩家：一次开火可多弹丸（霰弹）；冷却只扣一次。
+        if (!m_projectile_spawner->try_begin_shot())
+            return;
+
+        const int pellets{ m_projectile_spawner->get_pellet_count() };
+        const double spread{ m_projectile_spawner->get_spread_radians() };
+        const double base_rot{ firing_pt->get_global_rotation() };
+        const godot::Vector2 muzzle{ firing_pt->get_global_position() };
+
+        for (int i = 0; i < pellets; ++i)
+        {
+            Projectile* projectile{ m_projectile_spawner->create_projectile() };
+            if (projectile == nullptr)
+                continue;
+
+            double yaw_jitter{ 0.0 };
+            if (spread > 0.0)
+            {
+                if (pellets <= 1)
+                {
+                    yaw_jitter = godot::UtilityFunctions::randf_range(-spread, spread);
+                }
+                else
+                {
+                    const double t{ static_cast<double>(i) / static_cast<double>(pellets - 1) };
+                    yaw_jitter = (t * 2.0 - 1.0) * spread;
+                }
+            }
+
+            projectile->set_position(muzzle);
+            projectile->set_rotation(base_rot + yaw_jitter);
+            this->add_child(projectile);
+        }
+
+        const weapon_rules::WeaponDef weapon{ weapon_rules::get(m_weapon_id) };
+        combat_feedback::play_weapon_shot(this, muzzle, weapon.sfx);
     }
 
     [[signal_slot]]
@@ -620,9 +808,6 @@ namespace rl
         if (m_enemy_count > 0)
             --m_enemy_count;
 
-        if (m_enemy_count > 0)
-            return;
-
-        this->complete_room();
+        this->try_finish_current_wave();
     }
 }
