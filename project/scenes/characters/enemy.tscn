@@ -1,12 +1,17 @@
-[gd_scene format=3 uid="uid://drwc32sap2ko6"]
+[gd_scene load_steps=3 format=3 uid="uid://drwc32sap2ko6"]
 
 [ext_resource type="Texture2D" uid="uid://l1noga1ib7sw" path="res://assets/art/topdown/shooter/robot_1/robot1_gun.png" id="1_oue85"]
+[ext_resource type="Script" path="res://scripts/character_grounding.gd" id="2_ground"]
 
 [node name="Enemy" type="Enemy" unique_id=1118059825]
 scale = Vector2(2, 2)
 collision_layer = 2
 collision_mask = 9
 platform_on_leave = 2
+
+[node name="CharacterGrounding" type="Node" parent="."]
+script = ExtResource("2_ground")
+shadow_scale = Vector2(0.48, 0.18)
 
 [node name="PlayerCollisionPoly" type="CollisionPolygon2D" parent="." unique_id=1066678827]
 position = Vector2(0.5, -1.5)

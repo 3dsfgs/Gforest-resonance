@@ -1,10 +1,12 @@
-[gd_scene format=3 uid="uid://c8tur70b73kih"]
+[gd_scene load_steps=10 format=3 uid="uid://c8tur70b73kih"]
 
-[ext_resource type="Texture2D" uid="uid://bpf6bi2rgcg6f" path="res://assets/art/prototype_textures/light/texture_03.png" id="1_nl15v"]
+[ext_resource type="Texture2D" path="res://assets/art/rooms/forest/act1_cold_green_v1.png" id="1_bg"]
 [ext_resource type="Texture2D" uid="uid://f53cq3a3fclc" path="res://assets/art/prototype_textures/dark/texture_04.png" id="2_6qqh6"]
 [ext_resource type="Texture2D" uid="uid://bqvttsmny3jhe" path="res://assets/art/prototype_textures/red/texture_02.png" id="3_blm5m"]
 [ext_resource type="Texture2D" uid="uid://cgqd6qp3544xx" path="res://assets/art/prototype_textures/green/texture_10.png" id="4_ix12c"]
 [ext_resource type="Texture2D" uid="uid://d4hq6ws7sk0g4" path="res://assets/art/prototype_textures/purple/texture_02.png" id="5_pmdlb"]
+[ext_resource type="Script" path="res://scripts/dream_backdrop.gd" id="6_backdrop"]
+[ext_resource type="Script" path="res://scripts/combat_room_presentation.gd" id="7_combat"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_h"]
 size = Vector2(3200, 40)
@@ -18,10 +20,13 @@ polygon = PackedVector2Array(512, -512, -512, -512, -512, 512, 512, 512)
 
 [node name="Level1" type="Level" unique_id=1150245615]
 
+[node name="CombatPresentation" type="Node" parent="."]
+script = ExtResource("7_combat")
+
 [node name="BackgroundTexture" type="Sprite2D" parent="." unique_id=1485838909]
 show_behind_parent = true
-scale = Vector2(4, 4)
-texture = ExtResource("1_nl15v")
+texture = ExtResource("1_bg")
+script = ExtResource("6_backdrop")
 
 [node name="DirectionalLight2D" type="DirectionalLight2D" parent="." unique_id=1262624607]
 color = Color(1, 0.94902, 0.960784, 1)

@@ -6,27 +6,42 @@ const StorySequenceScene := preload("res://scenes/prefabs/story_sequence.tscn")
 const BedroomAnchorScene := preload("res://scenes/prefabs/bedroom_anchor.tscn")
 const RoomTransitionScript := preload("res://scripts/room_transition.gd")
 const MonologueHudScript := preload("res://scripts/monologue_hud.gd")
+const PauseMenuScript := preload("res://scripts/pause_menu.gd")
 
 const BEDROOM_HOLD_SEC := 1.35
+
+var _in_dream_run := false
 
 
 func _ready() -> void:
 	# 流程：标题 → 生辰档案 → 锚点夜 → OP → 梦房链 → ED → 锚点日 → 结语 → 回标题
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	if not run_victory.is_connected(_on_run_victory):
 		run_victory.connect(_on_run_victory)
 	if not room_advance_requested.is_connected(_on_room_advance_requested):
 		room_advance_requested.connect(_on_room_advance_requested)
 
 	var title := TitleScreenScene.instantiate()
+	title.name = "TitleScreen"
 	add_child(title)
 
 	if MusicDirector:
 		MusicDirector.play_title()
 
 
+func _unhandled_input(event: InputEvent) -> void:
+	if not event.is_action_pressed("ui_cancel"):
+		return
+	if not _can_open_pause():
+		return
+	_open_pause_menu()
+	get_viewport().set_input_as_handled()
+
+
 ## 不可 override C++ Main.begin_run()；用此入口开战并注入梦房链。
 ## 暂停「重开本晚」直接调用：跳过 OP。
 func start_dream_run() -> void:
+	_in_dream_run = true
 	_ensure_monologue_hud()
 	if DreamRoomChain:
 		configure_run(DreamRoomChain.build_run_config())
@@ -48,6 +63,19 @@ func play_opening_then_run() -> void:
 			start_dream_run()
 		)
 	)
+
+
+## 暂停「回标题」：卸关卡 + 清梦状态 + 重建标题屏。
+func go_to_title() -> void:
+	_in_dream_run = false
+	var mono := get_node_or_null("MonologueHud")
+	if mono != null:
+		mono.queue_free()
+	if has_method("return_to_title"):
+		return_to_title()
+	if MusicDirector:
+		MusicDirector.play_title()
+	_ensure_title_screen()
 
 
 func play_story_sequence(kind: String, on_finished: Callable = Callable()) -> void:
@@ -98,6 +126,7 @@ func _on_run_victory() -> void:
 	if _story_flow_busy() or has_node("EndingScreen"):
 		return
 
+	_in_dream_run = false
 	var mono := get_node_or_null("MonologueHud")
 	if mono != null:
 		mono.queue_free()
@@ -168,6 +197,39 @@ func _ensure_monologue_hud() -> void:
 
 func _story_flow_busy() -> bool:
 	return has_node("StorySequence") or has_node("BedroomAnchorLayer")
+
+
+func _can_open_pause() -> bool:
+	if not _in_dream_run:
+		return false
+	if has_node("PauseMenu"):
+		return false
+	if has_node("RoomTransition"):
+		return false
+	if has_node("EndingScreen"):
+		return false
+	if _story_flow_busy():
+		return false
+	return true
+
+
+func _open_pause_menu() -> void:
+	var menu: CanvasLayer = PauseMenuScript.new()
+	menu.name = "PauseMenu"
+	menu.setup(self)
+	add_child(menu)
+
+
+func _ensure_title_screen() -> void:
+	if has_node("TitleScreen"):
+		return
+	for child in get_children():
+		# title_screen.gd 动态搭建 UI，根为 CanvasLayer
+		if child.get_script() == preload("res://scripts/title_screen.gd"):
+			return
+	var title := TitleScreenScene.instantiate()
+	title.name = "TitleScreen"
+	add_child(title)
 
 
 func _on_custom_signal_example(delta_time):

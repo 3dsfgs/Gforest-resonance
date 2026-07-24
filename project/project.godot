@@ -20,6 +20,7 @@ config/features=PackedStringArray("4.7", "Forward Plus")
 
 [autoload]
 
+ThemeCatalog="*res://scripts/theme_catalog.gd"
 DreamRoomChain="*res://scripts/dream_room_chain.gd"
 MusicDirector="*res://scripts/music_director.gd"
 

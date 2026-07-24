@@ -1,6 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://bopll0oiaei41"]
+[gd_scene load_steps=6 format=3 uid="uid://bopll0oiaei41"]
 
 [ext_resource type="Texture2D" path="res://assets/art/enemies/shadow_wisp_purple_v1.png" id="1_brute"]
+[ext_resource type="Script" path="res://scripts/character_grounding.gd" id="2_ground"]
 
 [sub_resource type="Gradient" id="ShadowGradient"]
 offsets = PackedFloat32Array(0, 1)
@@ -20,9 +21,13 @@ collision_layer = 2
 collision_mask = 9
 platform_on_leave = 2
 
+[node name="CharacterGrounding" type="Node" parent="."]
+script = ExtResource("2_ground")
+shadow_scale = Vector2(0.55, 0.22)
+
 [node name="GroundShadow" type="Sprite2D" parent="."]
 z_index = -1
-scale = Vector2(0.22, 0.22)
+scale = Vector2(0.55, 0.22)
 texture = SubResource("ShadowTex")
 
 [node name="PlayerCollisionPoly" type="CollisionPolygon2D" parent="."]

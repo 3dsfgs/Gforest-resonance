@@ -1,6 +1,7 @@
-[gd_scene format=3 uid="uid://nuqlrvw8di7s"]
+[gd_scene load_steps=5 format=3 uid="uid://nuqlrvw8di7s"]
 
 [ext_resource type="Texture2D" uid="uid://d4koyc2tuk4mc" path="res://assets/art/topdown/shooter/soldier_1/soldier1_machine.png" id="1_rbbbp"]
+[ext_resource type="Script" path="res://scripts/character_grounding.gd" id="2_ground"]
 
 [sub_resource type="Gradient" id="Gradient_l415w"]
 offsets = PackedFloat32Array(0, 0.773179)
@@ -15,6 +16,10 @@ fill_from = Vector2(0.5, 0.5)
 scale = Vector2(2, 2)
 collision_mask = 10
 platform_on_leave = 2
+
+[node name="CharacterGrounding" type="Node" parent="."]
+script = ExtResource("2_ground")
+shadow_scale = Vector2(0.5, 0.18)
 
 [node name="PlayerCollisionPoly" type="CollisionPolygon2D" parent="." unique_id=1577222612]
 position = Vector2(0.5, -1.5)
