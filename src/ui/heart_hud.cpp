@@ -26,7 +26,9 @@ namespace rl::inline ui
         constexpr float heart_spacing{ 28.0f };
         constexpr float heart_padding{ 8.0f };
         constexpr float dash_bar_height{ 8.0f };
+        constexpr float skill_bar_height{ 6.0f };
         constexpr float dash_bar_gap{ 6.0f };
+        constexpr float skill_bar_gap{ 4.0f };
         constexpr float dash_bar_min_width{ 120.0f };
 
         godot::PackedVector2Array heart_polygon(const godot::Vector2 center)
@@ -67,6 +69,22 @@ namespace rl::inline ui
                 control->draw_line(points[i], points[next], outline, 1.5f, true);
             }
         }
+
+        void draw_ready_bar(godot::Control* control, const float x, const float y, const float width,
+                            const float height, const double ready_ratio,
+                            const godot::Color ready_color, const godot::Color cooling_color)
+        {
+            const godot::Rect2 track{ x, y, width, height };
+            control->draw_rect(track, godot::Color{ 0.18f, 0.2f, 0.24f, 0.9f });
+
+            const float fill_width{ width * static_cast<float>(ready_ratio) };
+            if (fill_width <= 0.5f)
+                return;
+
+            const bool ready{ ready_ratio >= 0.999 };
+            control->draw_rect(godot::Rect2{ x, y, fill_width, height },
+                               ready ? ready_color : cooling_color);
+        }
     }
 
     void HeartHud::_ready()
@@ -88,12 +106,19 @@ namespace rl::inline ui
         if (m_player == nullptr)
             return;
 
-        const double ratio{ m_player->get_dash_ready_ratio() };
-        if (godot::Math::abs(ratio - m_dash_ready_ratio) > 0.001)
-        {
-            m_dash_ready_ratio = ratio;
-            this->queue_redraw();
-        }
+        const double dash{ m_player->get_dash_ready_ratio() };
+        const double slash{ m_player->get_polar_slash_ready_ratio() };
+        const double light{ m_player->get_energy_light_ready_ratio() };
+        const bool changed{ godot::Math::abs(dash - m_dash_ready_ratio) > 0.001 ||
+                            godot::Math::abs(slash - m_polar_slash_ready_ratio) > 0.001 ||
+                            godot::Math::abs(light - m_energy_light_ready_ratio) > 0.001 };
+        if (!changed)
+            return;
+
+        m_dash_ready_ratio = dash;
+        m_polar_slash_ready_ratio = slash;
+        m_energy_light_ready_ratio = light;
+        this->queue_redraw();
     }
 
     void HeartHud::disconnect_from_player()
@@ -112,6 +137,8 @@ namespace rl::inline ui
 
         m_player = nullptr;
         m_dash_ready_ratio = 1.0;
+        m_polar_slash_ready_ratio = 1.0;
+        m_energy_light_ready_ratio = 1.0;
         this->queue_redraw();
     }
 
@@ -151,6 +178,8 @@ namespace rl::inline ui
 
         update_hearts(m_player->get_hearts(), m_player->get_max_hearts());
         m_dash_ready_ratio = m_player->get_dash_ready_ratio();
+        m_polar_slash_ready_ratio = m_player->get_polar_slash_ready_ratio();
+        m_energy_light_ready_ratio = m_player->get_energy_light_ready_ratio();
 
         signal<event::hearts_changed>::connect<Player>(m_player) <=>
             signal_callback(this, on_player_hearts_changed);
@@ -164,7 +193,8 @@ namespace rl::inline ui
             heart_padding * 2.0f + heart_spacing * static_cast<float>(m_max_hearts) };
         const float width{ std::max(hearts_width, dash_bar_min_width) };
         const float height{ heart_padding * 2.0f + heart_half_height * 2.0f + dash_bar_gap +
-                            dash_bar_height };
+                            dash_bar_height + skill_bar_gap + skill_bar_height + skill_bar_gap +
+                            skill_bar_height };
         this->set_custom_minimum_size({ width, height });
         this->set_size({ width, height });
     }
@@ -192,20 +222,25 @@ namespace rl::inline ui
             draw_heart(this, center, fill, outline);
         }
 
-        const float bar_y{ heart_padding + heart_half_height * 2.0f + dash_bar_gap };
         const float bar_width{ this->get_size().x - heart_padding * 2.0f };
-        const godot::Rect2 track{ heart_padding, bar_y, bar_width, dash_bar_height };
-        this->draw_rect(track, godot::Color{ 0.18f, 0.2f, 0.24f, 0.9f });
+        float bar_y{ heart_padding + heart_half_height * 2.0f + dash_bar_gap };
 
-        const float fill_width{ bar_width * static_cast<float>(m_dash_ready_ratio) };
-        if (fill_width > 0.5f)
-        {
-            const bool ready{ m_dash_ready_ratio >= 0.999 };
-            const godot::Color fill = ready ? godot::Color{ 0.35f, 0.85f, 0.95f, 0.95f }
-                                            : godot::Color{ 0.45f, 0.55f, 0.7f, 0.9f };
-            this->draw_rect(godot::Rect2{ heart_padding, bar_y, fill_width, dash_bar_height },
-                            fill);
-        }
+        // Dash (cyan)
+        draw_ready_bar(this, heart_padding, bar_y, bar_width, dash_bar_height, m_dash_ready_ratio,
+                       godot::Color{ 0.35f, 0.85f, 0.95f, 0.95f },
+                       godot::Color{ 0.45f, 0.55f, 0.7f, 0.9f });
+        bar_y += dash_bar_height + skill_bar_gap;
+
+        // Polar slash Q (cold cyan)
+        draw_ready_bar(this, heart_padding, bar_y, bar_width, skill_bar_height,
+                       m_polar_slash_ready_ratio, godot::Color{ 0.4f, 0.85f, 1.0f, 0.95f },
+                       godot::Color{ 0.25f, 0.45f, 0.6f, 0.9f });
+        bar_y += skill_bar_height + skill_bar_gap;
+
+        // Energy light E (warm gold)
+        draw_ready_bar(this, heart_padding, bar_y, bar_width, skill_bar_height,
+                       m_energy_light_ready_ratio, godot::Color{ 1.0f, 0.78f, 0.28f, 0.95f },
+                       godot::Color{ 0.55f, 0.4f, 0.18f, 0.9f });
     }
 
     void HeartHud::on_player_hearts_changed(const int current, const int max_hearts)

@@ -69,6 +69,8 @@ namespace rl
         signal_binding<CharacterController, event::character_rotate>::add<double, double>();
         signal_binding<CharacterController, event::character_shoot>::add<godot::Object*>();
         signal_binding<CharacterController, event::character_dash>::add<>();
+        signal_binding<CharacterController, event::character_polar_slash>::add<>();
+        signal_binding<CharacterController, event::character_energy_light>::add<>();
         signal_binding<CharacterController, event::position_changed>::add<godot::Object*,
                                                                           godot::Vector2>();
     }

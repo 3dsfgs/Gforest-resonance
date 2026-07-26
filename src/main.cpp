@@ -113,6 +113,10 @@ namespace rl
             return RoomKind::Whisper;
         if (room_kind == "mood")
             return RoomKind::Mood;
+        if (room_kind == "explore")
+            return RoomKind::Explore;
+        if (room_kind == "rest")
+            return RoomKind::Rest;
         if (room_kind == "boss")
             return RoomKind::Boss;
         return RoomKind::Combat;

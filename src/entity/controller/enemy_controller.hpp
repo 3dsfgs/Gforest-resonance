@@ -20,7 +20,8 @@ namespace rl
         enum class Behavior {
             ScoutRanged,
             BruteCharge,
-            HeartDemon
+            HeartDemon,
+            MeleeRush
         };
 
         EnemyController();
@@ -45,6 +46,7 @@ namespace rl
         void process_scout_movement(Player* player, double delta_time);
         void process_brute_movement(Player* player, double delta_time);
         void process_boss_movement(Player* player, double delta_time);
+        void process_melee_rush_movement(Player* player, double delta_time);
         void try_scout_shoot(Player* player);
         void try_boss_actions(Player* player);
         void fire_boss_burst(Player* player);

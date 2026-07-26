@@ -7,6 +7,7 @@ const BedroomAnchorScene := preload("res://scenes/prefabs/bedroom_anchor.tscn")
 const RoomTransitionScript := preload("res://scripts/room_transition.gd")
 const MonologueHudScript := preload("res://scripts/monologue_hud.gd")
 const PauseMenuScript := preload("res://scripts/pause_menu.gd")
+const BreadcrumbHudScript := preload("res://scripts/dream_breadcrumb_hud.gd")
 
 const BEDROOM_HOLD_SEC := 1.35
 
@@ -43,15 +44,24 @@ func _unhandled_input(event: InputEvent) -> void:
 func start_dream_run() -> void:
 	_in_dream_run = true
 	_ensure_monologue_hud()
+	_ensure_breadcrumb_hud()
 	if DreamRoomChain:
 		configure_run(DreamRoomChain.build_run_config())
+	var first_kind := "explore"
+	var first_name := "雾缘·小径"
+	if DreamRoomChain:
+		first_kind = DreamRoomChain.get_room_kind_at(0)
+		var chain: Array = DreamRoomChain.get_chain()
+		if not chain.is_empty():
+			first_name = str((chain[0] as Dictionary).get("display_name", first_name))
 	if MusicDirector:
-		MusicDirector.play_for_room_kind("combat")
+		MusicDirector.play_for_room_kind(first_kind)
 	begin_run()
+	_update_breadcrumb(0)
 	# 首房进场独白（无过场卡）
 	var mono := get_node_or_null("MonologueHud")
 	if mono != null and mono.has_method("on_room_entered"):
-		mono.on_room_entered(0, "雾缘", "combat")
+		mono.on_room_entered(0, first_name, first_kind)
 
 
 ## 生日门确认后：房间锚点（夜）→ 开场分镜 → 开战。
@@ -68,9 +78,7 @@ func play_opening_then_run() -> void:
 ## 暂停「回标题」：卸关卡 + 清梦状态 + 重建标题屏。
 func go_to_title() -> void:
 	_in_dream_run = false
-	var mono := get_node_or_null("MonologueHud")
-	if mono != null:
-		mono.queue_free()
+	_clear_dream_hud()
 	if has_method("return_to_title"):
 		return_to_title()
 	if MusicDirector:
@@ -104,22 +112,22 @@ func _on_room_advance_requested(next_index: int, hearts: int, room_name: String)
 				cleared_name = str((chain[cleared_i] as Dictionary).get("display_name", ""))
 		mono.on_room_cleared(next_index - 1, cleared_name)
 
-	var transition: CanvasLayer = RoomTransitionScript.new()
-	transition.name = "RoomTransition"
-	transition.setup(self, next_index, hearts, room_name)
-	add_child(transition)
-
-	# 过场结束后再播进房独白（延迟约等于过场时长）
 	var enter_kind := "combat"
 	if DreamRoomChain:
 		enter_kind = DreamRoomChain.get_room_kind_at(next_index)
-	get_tree().create_timer(2.2).timeout.connect(
-		func():
-			var m := get_node_or_null("MonologueHud")
-			if m != null and m.has_method("on_room_entered"):
-				m.on_room_entered(next_index, room_name, enter_kind),
-		CONNECT_ONE_SHOT
-	)
+
+	var transition: CanvasLayer = RoomTransitionScript.new()
+	transition.name = "RoomTransition"
+	transition.setup(self, next_index, hearts, room_name, enter_kind)
+	add_child(transition)
+
+
+## 过场加载下一房后由 room_transition 回调：独白 + 面包屑。
+func on_room_transition_entered(room_index: int, room_name: String, room_kind: String) -> void:
+	_update_breadcrumb(room_index)
+	var mono := get_node_or_null("MonologueHud")
+	if mono != null and mono.has_method("on_room_entered"):
+		mono.on_room_entered(room_index, room_name, room_kind)
 
 
 func _on_run_victory() -> void:
@@ -127,9 +135,7 @@ func _on_run_victory() -> void:
 		return
 
 	_in_dream_run = false
-	var mono := get_node_or_null("MonologueHud")
-	if mono != null:
-		mono.queue_free()
+	_clear_dream_hud()
 
 	# 卸下关卡，避免 ED 期间仍可操作
 	if has_method("return_to_title"):
@@ -193,6 +199,37 @@ func _ensure_monologue_hud() -> void:
 	var hud: CanvasLayer = MonologueHudScript.new()
 	hud.name = "MonologueHud"
 	add_child(hud)
+
+
+func _ensure_breadcrumb_hud() -> void:
+	if has_node("DreamBreadcrumbHud"):
+		return
+	var hud: CanvasLayer = BreadcrumbHudScript.new()
+	hud.name = "DreamBreadcrumbHud"
+	add_child(hud)
+
+
+func _update_breadcrumb(index: int) -> void:
+	var hud := get_node_or_null("DreamBreadcrumbHud")
+	if hud != null and hud.has_method("set_index"):
+		hud.set_index(index)
+
+
+func _clear_dream_hud() -> void:
+	var mono := get_node_or_null("MonologueHud")
+	if mono != null:
+		mono.queue_free()
+	var crumbs := get_node_or_null("DreamBreadcrumbHud")
+	if crumbs != null:
+		crumbs.queue_free()
+
+
+func get_dream_progress_text() -> String:
+	var hud := get_node_or_null("DreamBreadcrumbHud")
+	var idx := 0
+	if hud != null and hud.has_method("get_current_index"):
+		idx = int(hud.get_current_index())
+	return BreadcrumbHudScript.format_chain_text(idx)
 
 
 func _story_flow_busy() -> bool:

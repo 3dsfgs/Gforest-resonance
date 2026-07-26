@@ -16,6 +16,7 @@ namespace rl::inline constants
         constexpr inline auto spawn_point{ "SpawnPoint" };
         constexpr inline auto enemy_spawn_prefix{ "EnemySpawn" };
         constexpr inline auto enemy_brute_spawn_prefix{ "EnemyBruteSpawn" };
+        constexpr inline auto enemy_striker_spawn_prefix{ "EnemyStrikerSpawn" };
         constexpr inline auto enemy_boss_spawn_prefix{ "EnemyBossSpawn" };
         constexpr inline auto enemy_spawn1{ "EnemySpawn1" };
         constexpr inline auto damage_zone{ "DamageZone" };
@@ -42,6 +43,7 @@ namespace rl::inline constants
             constexpr inline auto player{ "Player" };
             constexpr inline auto enemy{ "Enemy" };
             constexpr inline auto enemy_brute{ "EnemyBrute" };
+            constexpr inline auto enemy_striker{ "EnemyStriker" };
             constexpr inline auto enemy_boss{ "EnemyBoss" };
             constexpr inline auto firing_pt{ "FiringPoint" };
             constexpr inline auto sprite{ "PlayerSprite" };
@@ -174,6 +176,9 @@ namespace rl::inline constants
         constexpr inline int enemy_brute_hearts{ 5 };
         /** Day6 慢而肉追击速度。 */
         constexpr inline double enemy_brute_movement_speed{ 200.0 };
+        /** ⭐3 影刺：低血高速贴脸。 */
+        constexpr inline int enemy_striker_hearts{ 2 };
+        constexpr inline double enemy_striker_movement_speed{ 520.0 };
         /** P2-4 心魔 Boss：高血量 + 中速环绕。 */
         constexpr inline int enemy_boss_hearts{ 12 };
         constexpr inline double enemy_boss_movement_speed{ 260.0 };
@@ -261,6 +266,31 @@ namespace rl::inline constants
         constexpr inline double dash_speed_mult{ 3.8 };
         constexpr inline double dash_cooldown{ 0.9 };
         constexpr inline double dash_invincibility_duration{ 0.22 };
+
+        /** ⭐1 极地斩：扇形近战 hitbox。 */
+        constexpr inline int polar_slash_damage_hearts{ 1 };
+        constexpr inline double polar_slash_cooldown{ 2.0 };
+        constexpr inline double polar_slash_active_duration{ 0.18 };
+        constexpr inline float polar_slash_range{ 96.0f };
+        constexpr inline float polar_slash_half_width{ 70.0f };
+        constexpr inline float polar_slash_hit_trauma{ 0.18f };
+
+        /** ⭐1 能量之光：+1 心 + 短时加速。 */
+        constexpr inline int energy_light_heal_hearts{ 1 };
+        constexpr inline double energy_light_cooldown{ 6.0 };
+        constexpr inline double energy_light_haste_duration{ 3.0 };
+        constexpr inline double energy_light_haste_mult{ 1.35 };
+        constexpr inline float energy_light_aura_radius{ 48.0f };
+
+        /** ⭐2 战斗拾取：击杀掉落回血心 / 短时加速。 */
+        constexpr inline double pickup_heal_drop_chance{ 0.28 };
+        constexpr inline double pickup_haste_drop_chance{ 0.14 };
+        constexpr inline int pickup_heal_hearts{ 1 };
+        constexpr inline double pickup_haste_duration{ 4.0 };
+        constexpr inline double pickup_haste_mult{ 1.25 };
+        constexpr inline float pickup_collect_radius{ 22.0f };
+        constexpr inline float pickup_bob_amplitude{ 4.0f };
+        constexpr inline double pickup_bob_speed{ 3.2 };
     }
 
     namespace event
@@ -275,6 +305,8 @@ namespace rl::inline constants
         constexpr inline auto character_rotate{ "character_rotate" };
         constexpr inline auto character_shoot{ "character_shoot" };
         constexpr inline auto character_dash{ "character_dash" };
+        constexpr inline auto character_polar_slash{ "character_polar_slash" };
+        constexpr inline auto character_energy_light{ "character_energy_light" };
         constexpr inline auto level_state_changed{ "level_state_changed" };
         constexpr inline auto room_cleared{ "room_cleared" };
         constexpr inline auto run_restart{ "run_restart" };
@@ -294,9 +326,9 @@ namespace rl::inline constants
         DamageZones = 0x00000010,
         DeathZones = 0x00000020,
         PhysicsObjects = 0x00000040,
-        Layer08 = 0x00000080,
-        Layer09 = 0x00000100,
-        Layer10 = 0x00000200,
+        PlayerMelee = 0x00000080,
+        PlayerAuras = 0x00000100,
+        Pickups = 0x00000200,
         Layer11 = 0x00000400,
         Layer12 = 0x00000800,
         Layer13 = 0x00001000,
@@ -341,6 +373,12 @@ namespace rl::inline constants
             projectile_mask | static_cast<uint32_t>(LayerID::PhysicsObjects) };
         /** Area2D trap mask: detect Player body. */
         constexpr inline uint32_t trap_mask{ static_cast<uint32_t>(LayerID::Player) };
+
+        constexpr inline uint32_t player_melee_layer{ static_cast<uint32_t>(LayerID::PlayerMelee) };
+        constexpr inline uint32_t player_melee_mask{ static_cast<uint32_t>(LayerID::NPCs) };
+        constexpr inline uint32_t player_auras_layer{ static_cast<uint32_t>(LayerID::PlayerAuras) };
+        constexpr inline uint32_t pickups_layer{ static_cast<uint32_t>(LayerID::Pickups) };
+        constexpr inline uint32_t pickups_mask{ static_cast<uint32_t>(LayerID::Player) };
     }
 
     namespace path
@@ -357,6 +395,8 @@ namespace rl::inline constants
             constexpr inline auto Enemy{ "res://scenes/characters/enemy.tscn" };
             /** Day6：慢而肉变体。 */
             constexpr inline auto EnemyBrute{ "res://scenes/characters/enemy_brute.tscn" };
+            /** ⭐3：影刺近战贴脸。 */
+            constexpr inline auto EnemyStriker{ "res://scenes/characters/enemy_striker.tscn" };
             /** P2-4：心魔 Boss。 */
             constexpr inline auto EnemyBoss{ "res://scenes/characters/enemy_boss.tscn" };
 

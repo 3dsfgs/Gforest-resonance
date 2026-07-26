@@ -225,6 +225,19 @@ namespace rl
         this->emit_signal(event::character_move, to_player.normalized(), delta_time);
     }
 
+    void EnemyController::process_melee_rush_movement(Player* player, const double delta_time)
+    {
+        const godot::Vector2 to_player{ player->get_global_position() - this->get_global_position() };
+        constexpr float stop_distance{ 8.0f };
+        if (to_player.length_squared() < stop_distance * stop_distance)
+        {
+            this->emit_signal(event::character_move, godot::Vector2{}, delta_time);
+            return;
+        }
+
+        this->emit_signal(event::character_move, to_player.normalized(), delta_time);
+    }
+
     void EnemyController::process_boss_movement(Player* player, const double delta_time)
     {
         godot::Vector2 to_player{ player->get_global_position() - this->get_global_position() };
@@ -320,6 +333,8 @@ namespace rl
             this->process_brute_movement(player, delta_time);
         else if (m_behavior == Behavior::HeartDemon)
             this->process_boss_movement(player, delta_time);
+        else if (m_behavior == Behavior::MeleeRush)
+            this->process_melee_rush_movement(player, delta_time);
         else
             this->process_scout_movement(player, delta_time);
     }

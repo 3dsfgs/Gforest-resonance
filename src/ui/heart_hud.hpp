@@ -44,5 +44,7 @@ namespace rl::inline ui
         int m_current_hearts{ 5 };
         int m_max_hearts{ 5 };
         double m_dash_ready_ratio{ 1.0 };
+        double m_polar_slash_ready_ratio{ 1.0 };
+        double m_energy_light_ready_ratio{ 1.0 };
     };
 }

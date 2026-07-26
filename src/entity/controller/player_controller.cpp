@@ -20,6 +20,12 @@ namespace rl
 
         if (input->is_action_just_pressed(input::action::dash))
             this->emit_signal(event::character_dash);
+
+        if (input->is_action_just_pressed(input::action::polar_slash))
+            this->emit_signal(event::character_polar_slash);
+
+        if (input->is_action_just_pressed(input::action::energy_light))
+            this->emit_signal(event::character_energy_light);
     }
 
     void PlayerController::process_movement_input(godot::Input* const input, double delta_time)

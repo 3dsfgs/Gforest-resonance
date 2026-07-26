@@ -11,11 +11,13 @@
 #include "entity/character/enemy.hpp"
 #include "entity/character/enemy_boss.hpp"
 #include "entity/character/enemy_brute.hpp"
+#include "entity/character/enemy_striker.hpp"
 #include "entity/character/player.hpp"
 #include "entity/controller/character_controller.hpp"
 #include "entity/controller/enemy_controller.hpp"
 #include "entity/controller/player_controller.hpp"
 #include "entity/level.hpp"
+#include "entity/pickup/combat_pickup.hpp"
 #include "entity/projectile/projectile_spawner.hpp"
 #include "main.hpp"
 #include "singletons/console.hpp"
@@ -67,8 +69,10 @@ namespace rl
         godot::ClassDB::register_class<rl::Character>();
         godot::ClassDB::register_class<rl::Enemy>();
         godot::ClassDB::register_class<rl::EnemyBrute>();
+        godot::ClassDB::register_class<rl::EnemyStriker>();
         godot::ClassDB::register_class<rl::EnemyBoss>();
         godot::ClassDB::register_class<rl::Player>();
+        godot::ClassDB::register_class<rl::CombatPickup>();
 
         godot::ClassDB::register_class<rl::Level>();
         godot::ClassDB::register_class<rl::MainDialog>();

@@ -31,11 +31,13 @@ namespace rl
         Defeat
     };
 
-    /** P2-6：梦房链房型。 */
+    /** P2-6 / HLD D2：梦房链房型。 */
     enum class RoomKind {
         Combat,
         Whisper,
         Mood,
+        Explore,
+        Rest,
         Boss
     };
 
@@ -83,6 +85,7 @@ namespace rl
         enum class EnemySpawnKind {
             Scout,
             Brute,
+            Striker,
             Boss
         };
 

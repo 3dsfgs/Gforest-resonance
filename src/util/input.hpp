@@ -18,6 +18,8 @@ namespace rl::inline utils
             constexpr inline auto move_down{ "move_down" };
             constexpr inline auto shoot{ "shoot" };
             constexpr inline auto dash{ "dash" };
+            constexpr inline auto polar_slash{ "polar_slash" };
+            constexpr inline auto energy_light{ "energy_light" };
             constexpr inline auto restart{ "restart" };
         }
 

@@ -21,6 +21,7 @@
 #include "entity/character/enemy.hpp"
 #include "entity/character/enemy_boss.hpp"
 #include "entity/character/enemy_brute.hpp"
+#include "entity/character/enemy_striker.hpp"
 #include "entity/controller/enemy_controller.hpp"
 #include "entity/controller/player_controller.hpp"
 #include "entity/level.hpp"
@@ -87,7 +88,8 @@ namespace rl
         if (m_state != LevelState::Playing)
             return;
 
-        if (m_room_kind != RoomKind::Whisper && m_room_kind != RoomKind::Mood)
+        if (m_room_kind != RoomKind::Whisper && m_room_kind != RoomKind::Mood
+            && m_room_kind != RoomKind::Explore && m_room_kind != RoomKind::Rest)
             return;
 
         this->complete_room();
@@ -236,6 +238,8 @@ namespace rl
             EnemySpawnKind kind{ EnemySpawnKind::Scout };
             if (child_name.begins_with(name::level::enemy_boss_spawn_prefix))
                 kind = EnemySpawnKind::Boss;
+            else if (child_name.begins_with(name::level::enemy_striker_spawn_prefix))
+                kind = EnemySpawnKind::Striker;
             else if (child_name.begins_with(name::level::enemy_brute_spawn_prefix))
                 kind = EnemySpawnKind::Brute;
             else if (child_name.begins_with(name::level::enemy_spawn_prefix))
@@ -328,6 +332,7 @@ namespace rl
     {
         resource::preload::packed_scene<Enemy> enemy_scene{ path::scene::Enemy };
         resource::preload::packed_scene<EnemyBrute> brute_scene{ path::scene::EnemyBrute };
+        resource::preload::packed_scene<EnemyStriker> striker_scene{ path::scene::EnemyStriker };
         resource::preload::packed_scene<EnemyBoss> boss_scene{ path::scene::EnemyBoss };
 
         Enemy* enemy{ nullptr };
@@ -337,6 +342,10 @@ namespace rl
             case EnemySpawnKind::Boss:
                 enemy = static_cast<Enemy*>(boss_scene.instantiate());
                 behavior = EnemyController::Behavior::HeartDemon;
+                break;
+            case EnemySpawnKind::Striker:
+                enemy = static_cast<Enemy*>(striker_scene.instantiate());
+                behavior = EnemyController::Behavior::MeleeRush;
                 break;
             case EnemySpawnKind::Brute:
                 enemy = static_cast<Enemy*>(brute_scene.instantiate());
