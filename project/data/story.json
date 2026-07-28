@@ -1,0 +1,113 @@
+{
+  "version": 1,
+  "op": {
+	"id": "sleep_to_dream",
+	"panels": [
+	  {
+		"image": "res://assets/art/cg/op/op_01_desk_exhaustion.png",
+		"duration": 4.0,
+		"caption": "今天也就这样吧。"
+	  },
+	  {
+		"image": "res://assets/art/cg/op/op_02_phone_clack.png",
+		"duration": 4.0,
+		"caption": "闭上眼，脑子却还在转。"
+	  },
+	  {
+		"image": "res://assets/art/cg/op/op_03_golden_mist.png",
+		"duration": 4.5,
+		"caption": "然后，你做了一个梦——"
+	  },
+	  {
+		"image": "res://assets/art/cg/op/op_04_dream_knight.png",
+		"duration": 4.0,
+		"caption": "……光呢？还在吗？"
+	  },
+	  {
+		"image": "res://assets/art/cg/op/op_05_light_silhouette.png",
+		"duration": 4.0,
+		"caption": "原来，光还在这里。"
+	  },
+	  {
+		"image": "res://assets/art/cg/op/op_06_forest_path.png",
+		"duration": 4.0,
+		"caption": "那就走进去看看。"
+	  }
+	]
+  },
+  "clear_fog_edge": {
+	"id": "clear_fog_edge",
+	"panels": [
+	  {
+		"image": "res://assets/art/cg/clear/clear_fog_01_mist_thins.png",
+		"duration": 3.2,
+		"caption": "影薄了一些。"
+	  },
+	  {
+		"image": "res://assets/art/cg/clear/clear_fog_02_path_ahead.png",
+		"duration": 3.2,
+		"caption": "继续往里走。"
+	  }
+	]
+  },
+  "clear_deep_heart": {
+	"id": "clear_deep_heart",
+	"panels": [
+	  {
+		"image": "res://assets/art/cg/clear/clear_deep_01_shadow_named.png",
+		"duration": 3.2,
+		"caption": "叫得出名字的，就不那么可怕。"
+	  },
+	  {
+		"image": "res://assets/art/cg/clear/clear_deep_02_light_nearer.png",
+		"duration": 3.2,
+		"caption": "光又近了一点。"
+	  }
+	]
+  },
+  "clear_light_door": {
+	"id": "clear_light_door",
+	"panels": [
+	  {
+		"image": "res://assets/art/cg/clear/clear_light_01_door_glow.png",
+		"duration": 3.2,
+		"caption": "门后还有一层。"
+	  },
+	  {
+		"image": "res://assets/art/cg/clear/clear_light_02_breath.png",
+		"duration": 3.2,
+		"caption": "先喘口气。"
+	  }
+	]
+  },
+  "ed": {
+	"id": "wake_up",
+	"panels": [
+	  {
+		"image": "res://assets/art/cg/ed/ed_00a_shadow_dissolves.png",
+		"duration": 3.5,
+		"caption": "镜子里的影，散了。"
+	  },
+	  {
+		"image": "res://assets/art/cg/ed/ed_00b_dream_recedes.png",
+		"duration": 3.5,
+		"caption": "该醒了。"
+	  },
+	  {
+		"image": "res://assets/art/cg/ed/ed_01_alarm_7am.png",
+		"duration": 4.0,
+		"caption": "梦醒了。"
+	  },
+	  {
+		"image": "res://assets/art/cg/ed/ed_02_standing_ready.png",
+		"duration": 4.0,
+		"caption": "也许只是太累了，需要放松。"
+	  },
+	  {
+		"image": "res://assets/art/cg/ed/ed_03_leaving_door.png",
+		"duration": 4.5,
+		"caption": "但该做的事，还在。——不过今天，你可以多改变一点。"
+	  }
+	]
+  }
+}

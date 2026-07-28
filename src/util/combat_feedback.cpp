@@ -115,7 +115,8 @@ namespace rl::combat_feedback
         play_one_shot(scene_parent, world_position, stream, combat::sfx_weapon_shot_volume_db);
     }
 
-    void spawn_kill_explosion(godot::Node* scene_parent, godot::Vector2 world_position)
+    void spawn_kill_explosion(godot::Node* scene_parent, godot::Vector2 world_position,
+                              KillVfxKind kind)
     {
         if (scene_parent == nullptr)
             return;
@@ -124,13 +125,26 @@ namespace rl::combat_feedback
         if (!frames.is_valid() || frames->get_frame_count(kill_anim_name) == 0)
             return;
 
+        float scale{ combat::kill_explosion_scale };
+        switch (kind)
+        {
+            case KillVfxKind::Striker:
+                scale = combat::kill_explosion_scale * 0.85f;
+                break;
+            case KillVfxKind::Boss:
+                scale = combat::kill_explosion_scale * 1.75f;
+                break;
+            case KillVfxKind::Default:
+            default:
+                break;
+        }
+
         godot::AnimatedSprite2D* burst{ memnew(godot::AnimatedSprite2D) };
         scene_parent->add_child(burst);
         burst->set_global_position(world_position);
         burst->set_sprite_frames(frames);
         burst->set_animation(kill_anim_name);
-        burst->set_scale(
-            godot::Vector2(combat::kill_explosion_scale, combat::kill_explosion_scale));
+        burst->set_scale(godot::Vector2(scale, scale));
         burst->set_z_index(combat::kill_explosion_z_index);
         burst->play(kill_anim_name);
         burst->connect("animation_finished", godot::Callable(burst, "queue_free"));

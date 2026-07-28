@@ -62,7 +62,7 @@ namespace rl
 
         godot::Node* parent{ this->get_parent() };
         const godot::Vector2 death_pos{ this->get_global_position() };
-        combat_feedback::spawn_kill_explosion(parent, death_pos);
+        combat_feedback::spawn_kill_explosion(parent, death_pos, this->kill_vfx_kind());
         combat_feedback::play_enemy_kill(parent, death_pos);
         try_spawn_combat_pickup(parent, death_pos);
 

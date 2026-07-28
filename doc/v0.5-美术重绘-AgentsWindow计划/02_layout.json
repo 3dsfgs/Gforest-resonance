@@ -1,0 +1,188 @@
+{
+  "meta": {
+    "title": "林间回响 v0.5 美术重绘 · 布局",
+    "canvas_default": [1920, 1080],
+    "text_rule": "同一句话内高亮数值（如 +25%、3s）必须同一 Text 层局部样式，禁止拆成多个文字层（若做 UI mock）"
+  },
+  "hud_combat_v2": {
+    "name": "Combat HUD / Skill Icons (no bars)",
+    "size": [1920, 1080],
+    "layers_bottom_to_top": [
+      {
+        "name": "01_RoomBG",
+        "type": "image_full_bleed",
+        "asset_ref": "rooms/forest/combat_mid"
+      },
+      {
+        "name": "02_OptionalForegroundSilhouette",
+        "type": "image_strip",
+        "asset_ref": "rooms/forest/fg_silhouette_mid",
+        "anchor": "bottom",
+        "note": "左右压暗剪影，引导视线，不挡核心战斗区"
+      },
+      {
+        "name": "03_PlayerTopdown",
+        "type": "image",
+        "asset_ref": "characters/protagonist_topdown",
+        "anchor": "center",
+        "approx_scale": 0.35
+      },
+      {
+        "name": "04_HeartLampRow",
+        "type": "row_of_icons",
+        "asset_ref": "hud/heart_lamp",
+        "position": { "x": 48, "y": 36 },
+        "count_max": 5,
+        "spacing": 44
+      },
+      {
+        "name": "05_SkillSigils",
+        "type": "row_of_skill_icons",
+        "position": { "x": 48, "y": 110 },
+        "item_size": [64, 64],
+        "gap": 16,
+        "items": [
+          {
+            "id": "dash",
+            "label": "冲刺",
+            "overlay": "cooldown_ring",
+            "forbid": "horizontal_bar"
+          },
+          {
+            "id": "polar_slash",
+            "label": "Q 极地斩",
+            "overlay": "cooldown_ring",
+            "forbid": "horizontal_bar"
+          },
+          {
+            "id": "energy_light",
+            "label": "E 能量之光",
+            "overlay": "cooldown_ring",
+            "forbid": "horizontal_bar"
+          }
+        ],
+        "cooldown_visual": {
+          "ready": "full_color + soft gold rim",
+          "cooling": "desaturate 50% + clockwise ring wipe 0→1",
+          "disabled": "grey + no glow"
+        }
+      },
+      {
+        "name": "06_WeaponChip",
+        "type": "badge",
+        "asset_ref": "hud/weapon_chip_pulse|pistol|shotgun",
+        "position": { "x": 48, "y": 190 }
+      },
+      {
+        "name": "07_RoomBadge",
+        "type": "text_or_badge",
+        "text_example": "深心",
+        "position": { "anchor": "top_center", "y": 28 }
+      },
+      {
+        "name": "08_Monologue",
+        "type": "text",
+        "example": "慢一点。梦不会催你。",
+        "position": { "anchor": "bottom_center", "y": 920 }
+      }
+    ]
+  },
+  "hud_mood_weapon_recall": {
+    "name": "Mood / Weapon Recall",
+    "size": [1920, 1080],
+    "layers_bottom_to_top": [
+      { "name": "01_BG", "asset_ref": "rooms/forest/mood" },
+      {
+        "name": "02_TwoPedestals",
+        "note": "左：武器卡；右：心灯碎片卡（插画 AI 位图，框可用矢量）"
+      },
+      {
+        "name": "03_WeaponCards",
+        "cards": [
+          { "weapon_id": "pistol", "title": "旧手枪", "recall_line": "你找回了一把旧手枪——快、准、一声一响。" },
+          { "weapon_id": "shotgun", "title": "散光铳", "recall_line": "你唤醒了散光铳——近处泼洒一片光。" }
+        ]
+      },
+      {
+        "name": "04_Prompt",
+        "text": "找回一件武器，或一枚心灯碎片",
+        "editable_text_single_node": true
+      }
+    ]
+  },
+  "room_chain_storyboard": {
+    "name": "Forest Night Chain · 8 frames",
+    "frame_size": [960, 540],
+    "arrangement": "2x4_grid_or_horizontal_filmstrip",
+    "frames": [
+      { "slot": "explore", "title": "雾缘·小径", "mood": "冷绿薄雾，路在中央" },
+      { "slot": "combat_early", "title": "雾缘", "mood": "同幕可战，空地清晰" },
+      { "slot": "whisper", "title": "低语", "mood": "蓝金，角落可读" },
+      { "slot": "combat_mid", "title": "深心", "mood": "影更深，仍有路径" },
+      { "slot": "mood", "title": "心境", "mood": "双座台舞台" },
+      { "slot": "combat_late", "title": "光扉", "mood": "暖金逆光门" },
+      { "slot": "rest", "title": "光扉·歇脚", "mood": "喘息，火/光锚点" },
+      { "slot": "boss", "title": "心魔", "mood": "对称竞技场，紫影焦点" }
+    ],
+    "composition_rules": [
+      "一屏一构图，中心或引导线明确",
+      "顶部 120px / 底部 160px 留给 HUD，重要焦点避开",
+      "禁止原型方块、Kenney 地板感"
+    ]
+  },
+  "weapon_sheet_layout": {
+    "name": "Weapons Grid 3x2",
+    "cell": [512, 512],
+    "cols": 3,
+    "rows": 2,
+    "gap": 32,
+    "background": "#00FF00 flat OR pure black for rmbg",
+    "cells": [
+      { "r": 0, "c": 0, "id": "pulse_icon_3q" },
+      { "r": 0, "c": 1, "id": "pistol_icon_3q" },
+      { "r": 0, "c": 2, "id": "shotgun_icon_3q" },
+      { "r": 1, "c": 0, "id": "pulse_topdown" },
+      { "r": 1, "c": 1, "id": "pistol_topdown" },
+      { "r": 1, "c": 2, "id": "shotgun_topdown" }
+    ]
+  },
+  "skill_sheet_layout": {
+    "name": "Skills Grid 3x3",
+    "cell": [256, 256],
+    "cols": 3,
+    "rows": 3,
+    "cells": [
+      { "r": 0, "c": 0, "id": "dash_ready" },
+      { "r": 0, "c": 1, "id": "polar_slash_ready" },
+      { "r": 0, "c": 2, "id": "energy_light_ready" },
+      { "r": 1, "c": 0, "id": "dash_cooling" },
+      { "r": 1, "c": 1, "id": "polar_slash_cooling" },
+      { "r": 1, "c": 2, "id": "energy_light_cooling" },
+      { "r": 2, "c": 0, "id": "dash_disabled" },
+      { "r": 2, "c": 1, "id": "polar_slash_disabled" },
+      { "r": 2, "c": 2, "id": "energy_light_disabled" }
+    ],
+    "note": "cooling/disabled 也可只出 ready，冷却环交给引擎 draw_arc"
+  },
+  "title_layouts": [
+    {
+      "name": "Title Forest",
+      "size": [1920, 1080],
+      "layers": ["bg_atmosphere", "soft_vignette", "game_title_text", "tagline_text"],
+      "texts": [
+        { "key": "game_title", "value": "林间回响", "single_node": true },
+        { "key": "tagline", "value": "太累了就睡一觉。梦里，光还在。", "single_node": true }
+      ]
+    },
+    {
+      "name": "Title Rainbow Sea Preview",
+      "size": [1920, 1080],
+      "layers": ["nebula_bg", "horizon_glow", "title_text", "preview_hint"],
+      "texts": [
+        { "key": "game_title", "value": "彩虹海", "single_node": true },
+        { "key": "tagline", "value": "下一晚的梦——星光与执念。", "single_node": true },
+        { "key": "preview_hint", "value": "通关迷雾森林后解锁", "single_node": true }
+      ]
+    }
+  ]
+}

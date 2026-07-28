@@ -1,0 +1,52 @@
+[gd_scene load_steps=6 format=3 uid="uid://c8heartboss01"]
+
+[ext_resource type="Texture2D" path="res://assets/art/enemies/shadow_boss_heart_v2.png" id="1_boss"]
+[ext_resource type="Script" path="res://scripts/character_grounding.gd" id="2_ground"]
+[ext_resource type="Script" path="res://scripts/enemy_visual_bob.gd" id="3_bob"]
+
+[sub_resource type="Gradient" id="ShadowGradient"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(0, 0, 0, 0.62, 0, 0, 0, 0)
+
+[sub_resource type="GradientTexture2D" id="ShadowTex"]
+gradient = SubResource("ShadowGradient")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 0)
+
+[node name="EnemyBoss" type="EnemyBoss"]
+scale = Vector2(3.1, 3.1)
+collision_layer = 2
+collision_mask = 9
+platform_on_leave = 2
+
+[node name="CharacterGrounding" type="Node" parent="."]
+script = ExtResource("2_ground")
+shadow_scale = Vector2(0.7, 0.28)
+
+[node name="EnemyVisualBob" type="Node" parent="."]
+script = ExtResource("3_bob")
+bob_amp = 8.0
+bob_speed = 1.4
+breath_amp = 0.05
+
+[node name="GroundShadow" type="Sprite2D" parent="."]
+z_index = -1
+scale = Vector2(0.7, 0.28)
+texture = SubResource("ShadowTex")
+
+[node name="PlayerCollisionPoly" type="CollisionPolygon2D" parent="."]
+position = Vector2(0.5, -1.5)
+rotation = -1.5708
+polygon = PackedVector2Array(8, 21.5, -21.5, 21.5, -21.5, -21.5, -4.5, -21.5, 8, 1.5)
+
+[node name="PlayerSprite" type="Sprite2D" parent="PlayerCollisionPoly"]
+modulate = Color(0.55, 0.28, 0.95, 1)
+scale = Vector2(0.12, 0.12)
+texture = ExtResource("1_boss")
+
+[node name="FiringPoint" type="Marker2D" parent="PlayerCollisionPoly"]
+unique_name_in_owner = true
+position = Vector2(23.5, 9.50009)

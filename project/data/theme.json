@@ -1,0 +1,133 @@
+{
+  "version": 1,
+  "active_theme": "forest",
+  "title_preview_theme": "rainbow_sea",
+  "themes": {
+	"forest": {
+	  "display_name": "迷雾森林",
+	  "tone": "治愈 / 出发",
+	  "unlock": "default",
+	  "palette": {
+		"veil": [0.04, 0.1, 0.07, 0.45],
+		"accent": [0.76, 0.59, 0.25, 1.0],
+		"fallback_bg": [0.05, 0.11, 0.08, 1.0]
+	  },
+	  "bg": {
+		"title": "res://assets/art/title/title_bg_v2.png",
+		"combat_early": "res://assets/art/rooms/forest/act1_cold_green_v3.png",
+		"combat_mid": "res://assets/art/rooms/forest/act2_blue_gold_v3.png",
+		"combat_late": "res://assets/art/rooms/forest/act3_warm_gold_v3.png",
+		"explore": "res://assets/art/rooms/forest/act0_explore_path_v3.png",
+		"whisper": "res://assets/art/rooms/forest/act2_whisper_v3.png",
+		"mood": "res://assets/art/rooms/mood/weapon_choice_v3.png",
+		"rest": "res://assets/art/rooms/forest/act3_rest_v3.png",
+		"boss": "res://assets/art/rooms/forest/act3_boss_arena_v3.png"
+	  },
+	  "fg": {
+		"cold": "res://assets/art/rooms/forest/fg_silhouette_cold_v2.png",
+		"gold": "res://assets/art/rooms/forest/fg_silhouette_gold_v2.png"
+	  },
+	  "enemy_sprites": {
+		"scout": "res://assets/art/enemies/shadow_scout_v2.png",
+		"brute": "res://assets/art/enemies/shadow_brute_v2.png",
+		"boss": "res://assets/art/enemies/shadow_boss_heart_v2.png"
+	  },
+	  "bgm": {
+		"title": "res://assets/audio/music/loops/flowing_rocks.ogg",
+		"explore": "res://assets/audio/music/loops/space_cadet.ogg",
+		"combat": "res://assets/audio/music/loops/mission_plausible.ogg",
+		"boss": "res://assets/audio/music/loops/infinite_descent.ogg",
+		"ending": "res://assets/audio/music/loops/night_at-the-beach.ogg"
+	  },
+	  "room_chain": "res://data/room_chain.json",
+	  "temperament_flavor_ref": "res://data/monologue.json",
+	  "room_names": {
+		"雾缘·小径": "没有敌人。路在雾里，你只需往前走。",
+		"雾缘": "梦从这里开始，薄雾像一层未醒的纱。",
+		"深心": "越往里，影越深。",
+		"光扉": "光在尽头，像一扇将要推开的门。",
+		"低语": "没有敌人，只有梦在说话。",
+		"心境": "你隐约想起，梦里曾落下两样东西。",
+		"光扉·歇脚": "深吸一口气。门后，是最深的自己。",
+		"心魔": "最深的影，像镜子里的自己。"
+	  },
+	  "title_text": {
+		"game_title": "林间回响",
+		"tagline": "太累了就睡一觉。梦里，光还在。"
+	  }
+	},
+	"rainbow_sea": {
+	  "display_name": "彩虹海",
+	  "tone": "浩瀚 / 执念",
+	  "unlock": "clear_forest",
+	  "palette": {
+		"veil": [0.08, 0.05, 0.18, 0.5],
+		"accent": [0.55, 0.72, 1.0, 1.0],
+		"fallback_bg": [0.06, 0.04, 0.14, 1.0]
+	  },
+	  "bg": {
+		"title": "res://assets/art/title/rainbow_sea_preview_v2.png",
+		"combat_early": "res://assets/art/rooms/forest/act2_blue_gold_v3.png",
+		"combat_mid": "res://assets/art/rooms/forest/act2_blue_gold_v3.png",
+		"combat_late": "res://assets/art/rooms/forest/act3_warm_gold_v3.png",
+		"explore": "res://assets/art/rooms/forest/act2_blue_gold_v3.png",
+		"whisper": "res://assets/art/rooms/forest/act2_whisper_v3.png",
+		"mood": "res://assets/art/rooms/mood/weapon_choice_v3.png",
+		"rest": "res://assets/art/rooms/forest/act3_rest_v3.png",
+		"boss": "res://assets/art/rooms/forest/act3_boss_arena_v3.png"
+	  },
+	  "enemy_sprites": {
+		"scout": "res://assets/art/enemies/shadow_scout_v2.png",
+		"brute": "res://assets/art/enemies/shadow_brute_v2.png",
+		"boss": "res://assets/art/enemies/shadow_boss_heart_v2.png"
+	  },
+	  "bgm": {
+		"title": "res://assets/audio/music/loops/space_cadet.ogg",
+		"explore": "res://assets/audio/music/loops/night_at-the-beach.ogg",
+		"combat": "res://assets/audio/music/loops/infinite_descent.ogg",
+		"boss": "res://assets/audio/music/loops/infinite_descent.ogg",
+		"ending": "res://assets/audio/music/loops/night_at-the-beach.ogg"
+	  },
+	  "room_chain": "res://data/room_chain_rainbow_sea.json",
+	  "room_names": {
+		"星岸·浅滩": "没有敌人。潮声像远方的约定，你只需往深处走。",
+		"潮缘": "星光落进海水里，像一串还没说完的话。",
+		"深流": "越往里，光越碎，执念却越清晰。",
+		"虹扉": "七色在尽头叠成一道门。推开它，或许就能到。",
+		"潮语": "没有敌人，只有海在替你说话。",
+		"心潮": "你隐约想起，梦里曾落下两样东西。",
+		"虹扉·歇脚": "深吸一口气。门后，是你一直想抵达的海。",
+		"海心影": "最深的影，像镜子里仍未抵达的自己。"
+	  },
+	  "title_text": {
+		"game_title": "彩虹海",
+		"tagline": "下一晚的梦——星光与执念。",
+		"preview_hint": "通关迷雾森林后解锁"
+	  }
+	},
+	"golden_temple": {
+	  "display_name": "黄金神庙",
+	  "tone": "试炼 / 神圣",
+	  "unlock": "stretch",
+	  "bg": {}
+	},
+	"cloud_port": {
+	  "display_name": "云海空港",
+	  "tone": "冒险 / 离别",
+	  "unlock": "stretch",
+	  "bg": {}
+	},
+	"frost": {
+	  "display_name": "极地",
+	  "tone": "坚忍",
+	  "unlock": "stretch",
+	  "bg": {}
+	},
+	"neon_city": {
+	  "display_name": "霓虹都市",
+	  "tone": "迷失 / 觉醒",
+	  "unlock": "stretch",
+	  "bg": {}
+	}
+  }
+}

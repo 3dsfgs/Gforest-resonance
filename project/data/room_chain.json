@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "chain_template": [
+	{ "slot": "explore", "fixed": "explore_01" },
+	{ "slot": "combat", "pool": "combat_early" },
+	{ "slot": "whisper", "fixed": "whisper_01" },
+	{ "slot": "combat", "pool": "combat_mid" },
+	{ "slot": "mood", "fixed": "mood_01" },
+	{ "slot": "combat", "pool": "combat_late" },
+	{ "slot": "rest", "fixed": "boss_prep_01" },
+	{ "slot": "boss", "fixed": "boss_01" }
+  ],
+  "rooms": {
+	"explore_01": {
+	  "id": "explore_fog_path",
+	  "scene": "res://scenes/levels/explore_room.tscn",
+	  "display_name": "雾缘·小径",
+	  "tagline": "没有敌人。路在雾里，你只需往前走。"
+	},
+	"combat_early": [
+	  {
+		"id": "combat_fog_edge",
+		"scene": "res://scenes/levels/level1.tscn",
+		"display_name": "雾缘",
+		"tagline": "梦从这里开始，薄雾像一层未醒的纱。"
+	  }
+	],
+	"combat_mid": [
+	  {
+		"id": "combat_deep_heart",
+		"scene": "res://scenes/levels/level2.tscn",
+		"display_name": "深心",
+		"tagline": "越往里，影越深。"
+	  }
+	],
+	"combat_late": [
+	  {
+		"id": "combat_light_door",
+		"scene": "res://scenes/levels/level3.tscn",
+		"display_name": "光扉",
+		"tagline": "光在尽头，像一扇将要推开的门。"
+	  }
+	],
+	"whisper_01": {
+	  "id": "whisper_pool",
+	  "scene": "res://scenes/levels/whisper_room.tscn",
+	  "display_name": "低语",
+	  "tagline": "没有敌人，只有梦在说话。",
+	  "whispers": [
+		"你听见自己的呼吸，比森林更轻。",
+		"那些影子不是来伤你的——它们只是还没被命名。",
+		"慢一点。梦不会催你。"
+	  ]
+	},
+	"mood_01": {
+	  "id": "mood_weapon_recall",
+	  "scene": "res://scenes/levels/mood_room.tscn",
+	  "display_name": "心境",
+	  "tagline": "你隐约想起，梦里曾落下两样东西。",
+	  "prompt": "找回一件武器，或一枚心灯碎片"
+	},
+	"boss_prep_01": {
+	  "id": "rest_before_boss",
+	  "scene": "res://scenes/levels/rest_room.tscn",
+	  "display_name": "光扉·歇脚",
+	  "tagline": "深吸一口气。门后，是最深的自己。"
+	},
+	"boss_01": {
+	  "id": "boss_heart_shadow",
+	  "scene": "res://scenes/levels/boss_room.tscn",
+	  "display_name": "心魔",
+	  "tagline": "最深的影，像镜子里的自己。"
+	}
+  }
+}

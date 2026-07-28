@@ -1,0 +1,219 @@
+{
+  "meta": {
+    "title": "林间回响 v0.5 美术重绘 · 资产清单",
+    "output_root": "gpt_gemini/v0.5_regen/",
+    "engine_art_root": "project/assets/art/",
+    "postprocess": ["split_grid", "remove_background", "trim_transparent_bounds", "export_png"],
+    "do_not": ["crop_from_cankao", "trace_old_sprites", "keep_progress_bar_skill_art"]
+  },
+  "sheets": [
+    {
+      "sheet_id": "weapons_3x2",
+      "filename": "sheets/weapons_grid_v2.png",
+      "strategy": "ai_bitmap_grid",
+      "cell_px": 512,
+      "grid": [3, 2],
+      "gap_px": 32,
+      "prompt_ref": "04_prompts_zh.md#weapons",
+      "splits": [
+        { "id": "pulse_icon_3q", "out": "splits/weapons/pulse_icon_3q.png" },
+        { "id": "pistol_icon_3q", "out": "splits/weapons/pistol_icon_3q.png" },
+        { "id": "shotgun_icon_3q", "out": "splits/weapons/shotgun_icon_3q.png" },
+        { "id": "pulse_topdown", "out": "splits/weapons/pulse_topdown.png" },
+        { "id": "pistol_topdown", "out": "splits/weapons/pistol_topdown.png" },
+        { "id": "shotgun_topdown", "out": "splits/weapons/shotgun_topdown.png" }
+      ],
+      "engine_targets": {
+        "hud_chips": "ui/weapons/",
+        "note": "引擎若尚无目录则新建；代码接入另开任务"
+      }
+    },
+    {
+      "sheet_id": "skills_3x3",
+      "filename": "sheets/skills_sigils_grid_v2.png",
+      "strategy": "ai_bitmap_grid",
+      "cell_px": 256,
+      "grid": [3, 3],
+      "prompt_ref": "04_prompts_zh.md#skills",
+      "splits": [
+        { "id": "dash_ready", "out": "splits/skills/dash_ready.png", "engine": "ui/skills/dash_ready.png" },
+        { "id": "polar_slash_ready", "out": "splits/skills/polar_slash_ready.png", "engine": "ui/skills/polar_slash_ready.png" },
+        { "id": "energy_light_ready", "out": "splits/skills/energy_light_ready.png", "engine": "ui/skills/energy_light_ready.png" },
+        { "id": "dash_cooling", "out": "splits/skills/dash_cooling.png", "optional": true },
+        { "id": "polar_slash_cooling", "out": "splits/skills/polar_slash_cooling.png", "optional": true },
+        { "id": "energy_light_cooling", "out": "splits/skills/energy_light_cooling.png", "optional": true },
+        { "id": "dash_disabled", "out": "splits/skills/dash_disabled.png", "optional": true },
+        { "id": "polar_slash_disabled", "out": "splits/skills/polar_slash_disabled.png", "optional": true },
+        { "id": "energy_light_disabled", "out": "splits/skills/energy_light_disabled.png", "optional": true }
+      ],
+      "replaces_ui_pattern": "heart_hud.cpp draw_ready_bar → TextureRect/Atlas + draw_arc ring"
+    },
+    {
+      "sheet_id": "projectiles_4x2",
+      "filename": "sheets/projectiles_fx_grid_v2.png",
+      "strategy": "ai_bitmap_grid",
+      "cell_px": 256,
+      "grid": [4, 2],
+      "splits": [
+        { "id": "pulse_bolt", "out": "splits/fx/pulse_bolt.png" },
+        { "id": "pistol_bolt", "out": "splits/fx/pistol_bolt.png" },
+        { "id": "shotgun_pellet", "out": "splits/fx/shotgun_pellet.png" },
+        { "id": "impact_spark", "out": "splits/fx/impact_spark.png" },
+        { "id": "muzzle_flash", "out": "splits/fx/muzzle_flash.png" },
+        { "id": "dash_afterimage", "out": "splits/fx/dash_afterimage.png" },
+        { "id": "slash_arc", "out": "splits/fx/slash_arc.png" },
+        { "id": "energy_ring", "out": "splits/fx/energy_ring.png" }
+      ]
+    },
+    {
+      "sheet_id": "hud_heart_2x2",
+      "filename": "sheets/hud_heart_lamp_grid_v2.png",
+      "strategy": "ai_bitmap_grid",
+      "cell_px": 256,
+      "grid": [2, 2],
+      "splits": [
+        { "id": "heart_lamp_full", "out": "splits/hud/heart_lamp_full.png", "engine": "ui/heart/heart_lamp_v2.png" },
+        { "id": "heart_lamp_empty", "out": "splits/hud/heart_lamp_empty.png", "engine": "ui/heart/heart_lamp_empty_v2.png" },
+        { "id": "heart_shard_pickup", "out": "splits/hud/heart_shard_pickup.png" },
+        { "id": "weapon_chip_frame", "out": "splits/hud/weapon_chip_frame.png" }
+      ]
+    }
+  ],
+  "full_bleed_rooms": [
+    {
+      "id": "forest_explore",
+      "out": "rooms/forest/act0_explore_path_v2.png",
+      "engine": "rooms/forest/act0_explore_path_v2.png",
+      "theme_json_key": "themes.forest.bg.explore",
+      "size": [1920, 1080]
+    },
+    {
+      "id": "forest_combat_early",
+      "out": "rooms/forest/act1_cold_green_v2.png",
+      "engine": "rooms/forest/act1_cold_green_v2.png",
+      "theme_json_key": "themes.forest.bg.combat_early",
+      "size": [1920, 1080]
+    },
+    {
+      "id": "forest_whisper",
+      "out": "rooms/forest/act2_whisper_v2.png",
+      "engine": "rooms/forest/act2_whisper_v2.png",
+      "theme_json_key": "themes.forest.bg.whisper",
+      "size": [1920, 1080],
+      "note": "可与 combat_mid 同幕调但构图更静；或单独一张"
+    },
+    {
+      "id": "forest_combat_mid",
+      "out": "rooms/forest/act2_blue_gold_v2.png",
+      "engine": "rooms/forest/act2_blue_gold_v2.png",
+      "theme_json_key": "themes.forest.bg.combat_mid",
+      "size": [1920, 1080]
+    },
+    {
+      "id": "forest_mood",
+      "out": "rooms/mood/weapon_choice_v2.png",
+      "engine": "rooms/mood/weapon_choice_v2.png",
+      "theme_json_key": "themes.forest.bg.mood",
+      "size": [1920, 1080]
+    },
+    {
+      "id": "forest_combat_late",
+      "out": "rooms/forest/act3_warm_gold_v2.png",
+      "engine": "rooms/forest/act3_warm_gold_v2.png",
+      "theme_json_key": "themes.forest.bg.combat_late",
+      "size": [1920, 1080]
+    },
+    {
+      "id": "forest_rest",
+      "out": "rooms/forest/act3_rest_v2.png",
+      "engine": "rooms/forest/act3_rest_v2.png",
+      "theme_json_key": "themes.forest.bg.rest",
+      "size": [1920, 1080]
+    },
+    {
+      "id": "forest_boss",
+      "out": "rooms/forest/act3_boss_arena_v2.png",
+      "engine": "rooms/forest/act3_boss_arena_v2.png",
+      "theme_json_key": "themes.forest.bg.boss",
+      "size": [1920, 1080]
+    }
+  ],
+  "foreground_strips": [
+    {
+      "id": "fg_silhouette_cold",
+      "out": "rooms/forest/fg_silhouette_cold_v2.png",
+      "size": [1920, 320],
+      "note": "透明底，底部树影/石剪影"
+    },
+    {
+      "id": "fg_silhouette_gold",
+      "out": "rooms/forest/fg_silhouette_gold_v2.png",
+      "size": [1920, 320]
+    }
+  ],
+  "characters": [
+    {
+      "id": "protagonist_topdown_v2",
+      "out": "characters/protagonist_topdown_combat_v2.png",
+      "engine": "characters/… 或沿用现有 player 贴图路径后改引用",
+      "size": [512, 512],
+      "transparent": true
+    },
+    {
+      "id": "enemy_scout_v2",
+      "out": "enemies/shadow_scout_v2.png",
+      "theme_json_key": "themes.forest.enemy_sprites.scout",
+      "transparent": true
+    },
+    {
+      "id": "enemy_brute_v2",
+      "out": "enemies/shadow_brute_v2.png",
+      "theme_json_key": "themes.forest.enemy_sprites.brute",
+      "transparent": true
+    },
+    {
+      "id": "enemy_boss_v2",
+      "out": "enemies/shadow_boss_heart_v2.png",
+      "theme_json_key": "themes.forest.enemy_sprites.boss",
+      "transparent": true
+    }
+  ],
+  "titles": [
+    {
+      "id": "title_forest_v2",
+      "out": "title/title_bg_v2.png",
+      "engine": "title/title_bg_v2.png",
+      "theme_json_key": "themes.forest.bg.title",
+      "size": [1920, 1080]
+    },
+    {
+      "id": "title_rainbow_sea_v2",
+      "out": "title/rainbow_sea_preview_v2.png",
+      "engine": "title/rainbow_sea_preview_v2.png",
+      "theme_json_key": "themes.rainbow_sea.bg.title",
+      "size": [1920, 1080]
+    }
+  ],
+  "generation_order": [
+    "skills_3x3",
+    "weapons_3x2",
+    "hud_heart_2x2",
+    "projectiles_4x2",
+    "forest_combat_early",
+    "forest_combat_mid",
+    "forest_combat_late",
+    "forest_explore",
+    "forest_whisper",
+    "forest_mood",
+    "forest_rest",
+    "forest_boss",
+    "fg_silhouette_cold",
+    "fg_silhouette_gold",
+    "protagonist_topdown_v2",
+    "enemy_scout_v2",
+    "enemy_brute_v2",
+    "enemy_boss_v2",
+    "title_forest_v2",
+    "title_rainbow_sea_v2"
+  ]
+}

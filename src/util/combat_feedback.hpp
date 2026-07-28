@@ -6,6 +6,14 @@
 
 namespace rl::combat_feedback
 {
+    /** Per-enemy-type kill burst presentation (shared frame sheet for now). */
+    enum class KillVfxKind
+    {
+        Default,
+        Striker,
+        Boss,
+    };
+
     /** One-shot SFX at world position (auto-freed). */
     void play_enemy_hit(godot::Node* scene_parent, godot::Vector2 world_position);
     void play_enemy_kill(godot::Node* scene_parent, godot::Vector2 world_position);
@@ -16,5 +24,6 @@ namespace rl::combat_feedback
                           const godot::String& sfx_path);
 
     /** AnimatedSprite2D kill burst at world position (auto-freed). */
-    void spawn_kill_explosion(godot::Node* scene_parent, godot::Vector2 world_position);
+    void spawn_kill_explosion(godot::Node* scene_parent, godot::Vector2 world_position,
+                              KillVfxKind kind = KillVfxKind::Default);
 }

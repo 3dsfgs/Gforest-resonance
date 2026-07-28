@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "chain_template": [
+	{ "slot": "explore", "fixed": "explore_01" },
+	{ "slot": "combat", "pool": "combat_early" },
+	{ "slot": "whisper", "fixed": "whisper_01" },
+	{ "slot": "combat", "pool": "combat_mid" },
+	{ "slot": "mood", "fixed": "mood_01" },
+	{ "slot": "combat", "pool": "combat_late" },
+	{ "slot": "rest", "fixed": "boss_prep_01" },
+	{ "slot": "boss", "fixed": "boss_01" }
+  ],
+  "rooms": {
+	"explore_01": {
+	  "id": "explore_star_shore",
+	  "scene": "res://scenes/levels/explore_room.tscn",
+	  "display_name": "星岸·浅滩",
+	  "tagline": "没有敌人。潮声像远方的约定，你只需往深处走。"
+	},
+	"combat_early": [
+	  {
+		"id": "combat_tide_edge",
+		"scene": "res://scenes/levels/level1.tscn",
+		"display_name": "潮缘",
+		"tagline": "星光落进海水里，像一串还没说完的话。"
+	  }
+	],
+	"combat_mid": [
+	  {
+		"id": "combat_deep_current",
+		"scene": "res://scenes/levels/level2.tscn",
+		"display_name": "深流",
+		"tagline": "越往里，光越碎，执念却越清晰。"
+	  }
+	],
+	"combat_late": [
+	  {
+		"id": "combat_prism_gate",
+		"scene": "res://scenes/levels/level3.tscn",
+		"display_name": "虹扉",
+		"tagline": "七色在尽头叠成一道门。推开它，或许就能到。"
+	  }
+	],
+	"whisper_01": {
+	  "id": "whisper_sea",
+	  "scene": "res://scenes/levels/whisper_room.tscn",
+	  "display_name": "潮语",
+	  "tagline": "没有敌人，只有海在替你说话。",
+	  "whispers": [
+		"你听见潮汐的节拍，比心跳更慢。",
+		"那些光点不是来伤你的——它们只是还没被命名。",
+		"慢一点。海不会催你。"
+	  ]
+	},
+	"mood_01": {
+	  "id": "mood_sea_recall",
+	  "scene": "res://scenes/levels/mood_room.tscn",
+	  "display_name": "心潮",
+	  "tagline": "你隐约想起，梦里曾落下两样东西。",
+	  "prompt": "找回一件武器，或一枚心灯碎片"
+	},
+	"boss_prep_01": {
+	  "id": "rest_before_sea_boss",
+	  "scene": "res://scenes/levels/rest_room.tscn",
+	  "display_name": "虹扉·歇脚",
+	  "tagline": "深吸一口气。门后，是你一直想抵达的海。"
+	},
+	"boss_01": {
+	  "id": "boss_sea_shadow",
+	  "scene": "res://scenes/levels/boss_room.tscn",
+	  "display_name": "海心影",
+	  "tagline": "最深的影，像镜子里仍未抵达的自己。"
+	}
+  }
+}

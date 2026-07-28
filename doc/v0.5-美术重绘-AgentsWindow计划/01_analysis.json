@@ -1,0 +1,252 @@
+{
+  "meta": {
+    "title": "林间回响 v0.5 美术重绘 · 分析",
+    "date": "2026-07-27",
+    "figma": {
+      "url": "https://www.figma.com/file/en5QOmzMHBH4JkAw79C76t?node-id=15-40",
+      "fileKey": "en5QOmzMHBH4JkAw79C76t",
+      "nodeId": "15:40",
+      "status": "mcp_unavailable_skip_write",
+      "note": "MCP 未注册/额度耗尽；本分析供 Agents Window 生图，不落 Figma"
+    },
+    "sources_of_truth": [
+      "project/data/theme.json",
+      "project/data/weapon_rules.json",
+      "project/data/room_chain.json",
+      "project/assets/art/concept/style_bible_board_v1_LOCKED.png",
+      "cankao/*.jpg (style vibe only, do not trace)"
+    ],
+    "hard_rules": [
+      "do_not_crop_cutout_or_trace_source_pixels",
+      "complex_art_must_ai_regenerate",
+      "batch_complex_assets_on_grid_sheets_then_split_rmbg_trim",
+      "skill_ui_must_not_look_like_horizontal_progress_bars",
+      "weapons_only_pulse_pistol_shotgun",
+      "highlight_numbers_stay_in_same_text_node_when_ui_mocked"
+    ]
+  },
+  "themes": [
+    {
+      "id": "forest",
+      "display_name": "迷雾森林",
+      "priority": 1,
+      "tone": "治愈 / 出发",
+      "palette_tokens": {
+        "cold_green": "#1A3A2E",
+        "veil": "rgba(10,26,18,0.45)",
+        "accent_gold": "#C29640",
+        "deep_blue_ui": "#0D1B2A",
+        "shadow_purple": "#5B3A7A",
+        "heart_lamp_gold": "#F0C738"
+      },
+      "room_slots": [
+        "explore",
+        "combat_early",
+        "whisper",
+        "combat_mid",
+        "mood",
+        "combat_late",
+        "rest",
+        "boss"
+      ]
+    },
+    {
+      "id": "rainbow_sea",
+      "display_name": "彩虹海",
+      "priority": 2,
+      "scope": "title_preview_only",
+      "tone": "浩瀚 / 执念",
+      "palette_tokens": {
+        "indigo": "#0F0A2E",
+        "magenta": "#C23B8B",
+        "accent_cyan": "#8CB8FF"
+      }
+    }
+  ],
+  "weapons": [
+    {
+      "id": "pulse",
+      "display_name": "脉冲枪",
+      "type": "ranged",
+      "visual": "短管光能枪；柔青白弹道；枪口柔光",
+      "media_strategy": "ai_bitmap",
+      "reason": "实体武器插画，禁止描摹旧贴图"
+    },
+    {
+      "id": "pistol",
+      "display_name": "旧手枪",
+      "type": "ranged",
+      "visual": "更像「找回的旧物」；冷金属+金线；弹道细锐",
+      "media_strategy": "ai_bitmap",
+      "reason": "实体武器插画"
+    },
+    {
+      "id": "shotgun",
+      "display_name": "散光铳",
+      "type": "ranged",
+      "visual": "宽口泼光；扇形五瓣光粒；近战距离压迫感",
+      "media_strategy": "ai_bitmap",
+      "reason": "实体武器插画"
+    }
+  ],
+  "skills": [
+    {
+      "id": "dash",
+      "binding": "dash",
+      "display_name": "冲刺",
+      "current_ui": "horizontal_cyan_progress_bar",
+      "target_ui": "icon_sigil_with_cooldown_ring_or_desaturate",
+      "icon_concept": "一对光羽 / 残影靴印，侧向疾走感",
+      "ready_color": "#59D9F2",
+      "media_strategy": "ai_bitmap",
+      "states": ["ready", "cooling", "disabled"]
+    },
+    {
+      "id": "polar_slash",
+      "binding": "Q",
+      "display_name": "极地斩",
+      "current_ui": "horizontal_cold_cyan_progress_bar",
+      "target_ui": "icon_sigil_with_cooldown_ring_or_desaturate",
+      "icon_concept": "新月弧刃 + 冰晶裂痕，横扫剪影",
+      "ready_color": "#66D9FF",
+      "media_strategy": "ai_bitmap",
+      "states": ["ready", "cooling", "disabled"]
+    },
+    {
+      "id": "energy_light",
+      "binding": "E",
+      "display_name": "能量之光",
+      "current_ui": "horizontal_warm_gold_progress_bar",
+      "target_ui": "icon_sigil_with_cooldown_ring_or_desaturate",
+      "icon_concept": "心灯光环落地点；暖金丁达尔",
+      "ready_color": "#F0C738",
+      "media_strategy": "ai_bitmap",
+      "states": ["ready", "cooling", "disabled"]
+    }
+  ],
+  "hud_elements": [
+    {
+      "id": "heart_lamp_row",
+      "role": "hp",
+      "media_strategy": "ai_bitmap",
+      "note": "心灯单体图标；满/空两态；勿用圆点代替"
+    },
+    {
+      "id": "weapon_chip",
+      "role": "current_weapon_badge",
+      "media_strategy": "ai_bitmap",
+      "note": "小徽章，显示当前武器剪影"
+    },
+    {
+      "id": "skill_cooldown_ring",
+      "role": "procedural_overlay",
+      "media_strategy": "engine_vector",
+      "reason": "冷却环可用 draw_arc；图标本体仍 AI 位图"
+    },
+    {
+      "id": "whisper_box_chrome",
+      "role": "ui_frame",
+      "media_strategy": "figma_or_engine_vector",
+      "reason": "金边深蓝圆角框，几何为主"
+    }
+  ],
+  "rooms_forest": [
+    {
+      "slot": "explore",
+      "display_name": "雾缘·小径",
+      "media_strategy": "ai_bitmap",
+      "complexity": "high",
+      "needs": ["full_bleed_bg", "optional_foreground_silhouette_strip"]
+    },
+    {
+      "slot": "combat_early",
+      "display_name": "雾缘",
+      "media_strategy": "ai_bitmap",
+      "complexity": "high"
+    },
+    {
+      "slot": "whisper",
+      "display_name": "低语",
+      "media_strategy": "ai_bitmap",
+      "complexity": "high",
+      "needs": ["secret_corner_readable"]
+    },
+    {
+      "slot": "combat_mid",
+      "display_name": "深心",
+      "media_strategy": "ai_bitmap",
+      "complexity": "high"
+    },
+    {
+      "slot": "mood",
+      "display_name": "心境",
+      "media_strategy": "ai_bitmap",
+      "complexity": "high",
+      "needs": ["two_pedestal_stage_for_weapon_vs_heart"]
+    },
+    {
+      "slot": "combat_late",
+      "display_name": "光扉",
+      "media_strategy": "ai_bitmap",
+      "complexity": "high"
+    },
+    {
+      "slot": "rest",
+      "display_name": "光扉·歇脚",
+      "media_strategy": "ai_bitmap",
+      "complexity": "high"
+    },
+    {
+      "slot": "boss",
+      "display_name": "心魔",
+      "media_strategy": "ai_bitmap",
+      "complexity": "high",
+      "needs": ["symmetric_arena", "shadow_purple_accent"]
+    }
+  ],
+  "characters_enemies": [
+    {
+      "id": "protagonist_topdown",
+      "media_strategy": "ai_bitmap",
+      "note": "俯视战斗剪影；蓝金；透明底；可与旧版同构图但必须重生"
+    },
+    {
+      "id": "enemy_scout",
+      "media_strategy": "ai_bitmap",
+      "note": "替换 Kenney robot；紫影小怪"
+    },
+    {
+      "id": "enemy_brute",
+      "media_strategy": "ai_bitmap"
+    },
+    {
+      "id": "enemy_boss_heart_shadow",
+      "media_strategy": "ai_bitmap"
+    }
+  ],
+  "fx": [
+    {
+      "id": "projectiles_sheet",
+      "media_strategy": "ai_bitmap_grid",
+      "cells": ["pulse_bolt", "pistol_bolt", "shotgun_pellet", "impact_spark", "muzzle_flash", "dash_afterimage", "slash_arc", "energy_ring"]
+    },
+    {
+      "id": "particles_sheet",
+      "media_strategy": "ai_bitmap_grid",
+      "cells": ["leaf_mist", "gold_mote", "shadow_flake", "heart_shard"]
+    }
+  ],
+  "title": [
+    {
+      "id": "title_forest",
+      "path_key": "themes.forest.bg.title",
+      "media_strategy": "ai_bitmap"
+    },
+    {
+      "id": "title_rainbow_sea_preview",
+      "path_key": "themes.rainbow_sea.bg.title",
+      "media_strategy": "ai_bitmap",
+      "note": "浩瀚星海/虹潮；可参考 cankao 拉钩情绪但禁止描摹双手"
+    }
+  ]
+}

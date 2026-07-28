@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "default": "pulse",
+  "weapons": [
+	{
+	  "id": "pulse",
+	  "display_name": "脉冲枪",
+	  "recall_line": "熟悉的光还在手里。",
+	  "type": "ranged",
+	  "fire_rate": 7.0,
+	  "damage_hearts": 1,
+	  "spread_radians": 0.04,
+	  "pellet_count": 1,
+	  "impulse": 1100.0,
+	  "sfx": "res://assets/audio/sfx/sci_fi/lasersmall_000.ogg"
+	},
+	{
+	  "id": "pistol",
+	  "display_name": "旧手枪",
+	  "recall_line": "你找回了一把旧手枪——快、准、一声一响。",
+	  "type": "ranged",
+	  "fire_rate": 4.8,
+	  "damage_hearts": 2,
+	  "spread_radians": 0.012,
+	  "pellet_count": 1,
+	  "impulse": 1300.0,
+	  "sfx": "res://assets/audio/sfx/sci_fi/laserretro_001.ogg"
+	},
+	{
+	  "id": "shotgun",
+	  "display_name": "散光铳",
+	  "recall_line": "你唤醒了散光铳——近处泼洒一片光。",
+	  "type": "ranged",
+	  "fire_rate": 1.7,
+	  "damage_hearts": 1,
+	  "spread_radians": 0.2,
+	  "pellet_count": 5,
+	  "impulse": 950.0,
+	  "sfx": "res://assets/audio/sfx/sci_fi/laserlarge_000.ogg"
+	}
+  ]
+}

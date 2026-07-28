@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "rules": [
+	{
+	  "id": "humble_roots",
+	  "title": "出身寒微",
+	  "desc": "出身寒微不是耻辱，能屈能伸方为丈夫。你脚步慢些，心却更厚。",
+	  "story_hook": "你习惯走慢一步——但每一步都踩得很稳。",
+	  "buffs": {
+		"max_hearts_delta": 1,
+		"movement_speed_mult": 0.9,
+		"fire_rate_mult": 1.0
+	  },
+	  "buff_summary": "心灯略稳 · 脚步略沉"
+	},
+	{
+	  "id": "lone_blade",
+	  "title": "孤军奋战",
+	  "desc": "一个人走夜路不可怕，可怕的是忘了自己手里还有光。",
+	  "story_hook": "一个人扛惯了。今晚也是。",
+	  "buffs": {
+		"max_hearts_delta": -1,
+		"movement_speed_mult": 1.0,
+		"fire_rate_mult": 1.25
+	  },
+	  "buff_summary": "出手更快 · 心灯更薄"
+	},
+	{
+	  "id": "still_waters",
+	  "title": "静水深流",
+	  "desc": "不争一时快慢，脚步却总在向前。森林听得见你的呼吸。",
+	  "story_hook": "你不急着证明什么，但从不原地打转。",
+	  "buffs": {
+		"max_hearts_delta": 0,
+		"movement_speed_mult": 1.15,
+		"fire_rate_mult": 1.0
+	  },
+	  "buff_summary": "脚步更轻"
+	},
+	{
+	  "id": "slow_bloom",
+	  "title": "厚积薄发",
+	  "desc": "慢一点没关系。你攒下的力量，会在某一天忽然发光。",
+	  "story_hook": "你愿意等——等到该亮的那一下。",
+	  "buffs": {
+		"max_hearts_delta": 1,
+		"movement_speed_mult": 1.0,
+		"fire_rate_mult": 0.85
+	  },
+	  "buff_summary": "心灯略稳 · 出手略缓"
+	},
+	{
+	  "id": "toward_light",
+	  "title": "向光而行",
+	  "desc": "困住你的从来不是黑暗，而是忘了自己能发光。",
+	  "story_hook": "你总往亮处走。哪怕亮处很远。",
+	  "buffs": {
+		"max_hearts_delta": 0,
+		"movement_speed_mult": 1.08,
+		"fire_rate_mult": 1.12
+	  },
+	  "buff_summary": "脚步与出手都轻快一点"
+	},
+	{
+	  "id": "bend_and_rise",
+	  "title": "能屈能伸",
+	  "desc": "弯下腰不是认输，是为了下一次起跳。你已准备好再进森林。",
+	  "story_hook": "你知道何时低头，也知道何时再站起来。",
+	  "buffs": {
+		"max_hearts_delta": 0,
+		"movement_speed_mult": 0.95,
+		"fire_rate_mult": 1.18
+	  },
+	  "buff_summary": "出手更快 · 脚步略沉"
+	}
+  ]
+}
